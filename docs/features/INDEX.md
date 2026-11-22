@@ -4,4 +4,4 @@ Status: `spec` → `planned` → `in-progress` → `done` (once done, the folder
 
 | Feature | Status | Owner | Folder |
 |---|---|---|---|
-| test-setup | in-progress | david | [features/test-setup/](test-setup/) |
+| test-setup | done | david | [features/_archive/test-setup/](_archive/test-setup/) |

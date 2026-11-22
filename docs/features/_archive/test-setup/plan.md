@@ -2,7 +2,7 @@
 
 ## Approach
 
-Add Vitest for unit and component tests and Playwright for browser tests, as recorded in [decision 0001](../../decisions/0001-vitest-and-playwright-for-tests.md).
+Add Vitest for unit and component tests and Playwright for browser tests, as recorded in [decision 0001](../../../decisions/0001-vitest-and-playwright-for-tests.md).
 
 - **Vitest** is configured inside the existing `vite.config.ts`, so tests use the same `@/` paths and React plugin as the app. A small setup file clears saved browser data before each test and removes anything the previous test rendered. Test files live in `src/`, which `tsconfig.app.json` already includes, so `pnpm build` type-checks them. The app never imports them, so they stay out of the production build.
 - **Playwright** reads a new `playwright.config.ts` with two projects (desktop Chromium, Pixel 7 Chromium). It starts `pnpm dev` on port 5173, or reuses a running one when not in CI. `e2e/` and the config are added to `tsconfig.node.json` so they're type-checked too.
@@ -37,7 +37,7 @@ The starter tests describe today's behavior and change no app code. The Monday r
 - [x] 3. Install `@playwright/test` and Chromium. Add the `test:e2e` script, `playwright.config.ts`, the `tsconfig.node.json` include and the `.gitignore` entries. Write `e2e/checkout.spec.ts`. Run `pnpm test:e2e` with nothing on port 5173, then again with `pnpm dev` already running. Check that both screen sizes are listed, that no server is left running, and that a deliberately failing step exits non-zero (then undo it). Covers R4, R5, R6, R11.
 - [x] 4. Check that the test files don't break the build. Run `pnpm build` and `pnpm lint`. Confirm that a deliberate type error in a test file fails `pnpm build` (then undo it), that `dist/` contains no test code, and that `git status` is unchanged after both test commands. Covers R6, R7.
 - [x] 5. Add `.github/workflows/ci.yml`. Before pushing anything, ask David whether a branch can be pushed to check the workflow. A green run checks R12. A throwaway commit with a failing browser test checks that the run fails and the report can be downloaded, and it's then dropped. Covers R12, R13.
-  - Done 2026-11-22: David pushed `feature/test-setup` and checked it himself. Run 44983208787 on `ce08d8d` passed with every step run. No red run was made, so R12's failing half and R13 are still untested.
+  - Done 2026-11-22: David pushed `feature/test-setup` and checked it himself. Run 44983208787 on `ce08d8d` passed with every step run. For the red run, a throwaway branch `ci-red-check` (commit `167b8c1`) added a failing browser test. Run 44984206284 failed at `pnpm test:e2e`, the report step ran, and the `playwright-report` artifact downloaded with the HTML report plus a trace and error context for both screen sizes. The branch was then deleted locally and on GitHub.
 - [x] 6. Update the README, remove the `_TBD_` line from `CLAUDE.md`, and update Tech stack and Conventions → Testing in `docs/architecture.md`. Covers R14.
 
 ## Tests
