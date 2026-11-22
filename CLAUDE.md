@@ -32,7 +32,7 @@ See [decision 0002](docs/decisions/0002-kiss-and-dry-guardrails.md).
 - Font: Be Vietnam Pro, weights 400/500/600/700 (already loaded from Fontsource).
 - All UI copy is Vietnamese (decision 0004). Every price goes through `formatPrice` in `src/lib/store.ts`; don't format money anywhere else.
 - Touch targets at least 44 × 44 px. Use real `<button>`, `<a>`/`<Link>` and `<label>`, never a clickable `<div>`.
-- The mockups take shortcuts: every card opens the same product and each screen has its own cart. The app keeps its real `/p/:slug` route and its one shared `CartProvider`.
+- The mockups are look and layout only; their data and logic are placeholders. The app keeps its catalog, its `/p/:slug` routes, its one shared `CartProvider`, its store rules and its COD-only checkout. `design/README.md` lists what not to copy.
 
 ## Workflow commands
 

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Cửa hàng của Thy — Cửa hàng</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E5B3A}a:hover{color:#143F28}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; display: flex; flex-direction: column; background: #F7F5EE; font-family: 'Be Vietnam Pro', system-ui, sans-serif; color: #1C1C18">
+
+  <div style="padding: 20px 20px 12px; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 12px; color: #5E5E56">Giao đến</span>
+        <button type="button" style="all: unset; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 15px; font-weight: 600; min-height: 28px">
+          Nhà riêng
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <div style="width: 36px; height: 36px; border-radius: 10px; background: #1E5B3A; color: #F7F5EE; display: flex; align-items: center; justify-content: center">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18l-2 10H5z"/><path d="M8 10l4-6 4 6"/></svg>
+        </div>
+        <span style="font-size: 18px; font-weight: 700; color: #1E5B3A; letter-spacing: -0.2px">Cửa hàng của Thy</span>
+      </div>
+    </div>
+
+    <label for="q" class="sr">Tìm sản phẩm</label>
+    <div style="display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 14px; border-radius: 14px; background: #FFFFFF; border: 1px solid #E4E1D6">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5E5E56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Tìm nước, snack, dừa…" style="flex: 1; border: 0; outline: none; background: transparent; font: inherit; font-size: 15px; color: #1C1C18">
+    </div>
+  </div>
+
+  <div style="flex: 1; overflow-y: auto; padding: 4px 20px 112px; display: flex; flex-direction: column; gap: 20px">
+
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px; border-radius: 18px; background: #1E5B3A; color: #F7F5EE">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 17px; font-weight: 700; line-height: 1.3">Dừa xiêm tươi mỗi sáng</span>
+        <span style="font-size: 13px; line-height: 1.4; color: #D9E6DC">Gọt sẵn, ướp lạnh, giao tận nhà</span>
+        <button type="button" onClick="{{ pickCoconut }}" style="align-self: flex-start; margin-top: 6px; min-height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: #F2C14E; color: #1C1C18; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer">Mua dừa</button>
+      </div>
+      <svg aria-hidden="true" width="84" height="84" viewBox="0 0 24 24" fill="none" stroke="#F2C14E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><circle cx="9.5" cy="11" r="1"/><circle cx="14.5" cy="11" r="1"/><circle cx="12" cy="15" r="1"/><path d="M12 5c1-2 3-3 5-3"/></svg>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 700">Danh mục</h2>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px">
+        <sc-for list="{{ cats }}" as="c" hint-placeholder-count="4">
+          <button type="button" onClick="{{ c.pick }}" aria-pressed="{{ c.pressed }}" style="all: unset; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px">
+            <span style="width: 72px; height: 72px; box-sizing: border-box; border-radius: 20px; display: flex; align-items: center; justify-content: center; background: {{c.bg}}; color: {{c.fg}}; border: 2px solid {{c.ring}}">
+              <sc-if value="{{ c.isWater }}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4v3l2 3v12a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V8l2-3z"/><path d="M8 12h8"/></svg></sc-if>
+              <sc-if value="{{ c.isSnack }}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10l1 4v12l-1 2H7l-1-2V7z"/><path d="M6 7h12M6 18h12"/><circle cx="12" cy="12.5" r="2.5"/></svg></sc-if>
+              <sc-if value="{{ c.isCoconut }}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><circle cx="9.5" cy="11" r="1"/><circle cx="14.5" cy="11" r="1"/><circle cx="12" cy="15" r="1"/></svg></sc-if>
+              <sc-if value="{{ c.isEssential }}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18l-2 10H5z"/><path d="M8 10l4-6 4 6"/><path d="M9 14v3M15 14v3M12 14v3"/></svg></sc-if>
+            </span>
+            <span style="font-size: 13px; font-weight: 600; text-align: center">{{ c.name }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; align-items: center; justify-content: space-between; min-height: 32px">
+        <h2 style="margin: 0; font-size: 17px; font-weight: 700">{{ sectionTitle }}</h2>
+        <sc-if value="{{ filtered }}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{ showAll }}" style="all: unset; cursor: pointer; font-size: 14px; font-weight: 600; color: #1E5B3A; min-height: 32px; display: flex; align-items: center">Xem tất cả</button>
+        </sc-if>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <sc-for list="{{ items }}" as="p" hint-placeholder-count="4">
+          <div style="display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 18px; background: #FFFFFF; border: 1px solid #ECE9DF">
+            <a href="Product.dc.html" style="display: flex; flex-direction: column; gap: 8px; color: inherit; text-decoration: none">
+            <div style="height: 108px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: {{p.bg}}; color: {{p.fg}}">
+              <sc-if value="{{ p.isWater }}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4v3l2 3v12a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V8l2-3z"/><path d="M8 12h8"/></svg></sc-if>
+              <sc-if value="{{ p.isSnack }}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10l1 4v12l-1 2H7l-1-2V7z"/><path d="M6 7h12M6 18h12"/><circle cx="12" cy="12.5" r="2.5"/></svg></sc-if>
+              <sc-if value="{{ p.isCoconut }}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><circle cx="9.5" cy="11" r="1"/><circle cx="14.5" cy="11" r="1"/><circle cx="12" cy="15" r="1"/></svg></sc-if>
+              <sc-if value="{{ p.isEssential }}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18l-2 10H5z"/><path d="M8 10l4-6 4 6"/><path d="M9 14v3M15 14v3M12 14v3"/></svg></sc-if>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px; padding: 0 2px">
+              <span style="font-size: 14px; font-weight: 600; line-height: 1.35; min-height: 38px">{{ p.name }}</span>
+              <span style="font-size: 12px; color: #5E5E56">{{ p.unit }}</span>
+              <span style="font-size: 16px; font-weight: 700; color: #1E5B3A; margin-top: 2px">{{ p.priceText }}</span>
+            </div>
+            </a>
+            <sc-if value="{{ p.notInCart }}" hint-placeholder-val="{{ true }}">
+              <button type="button" onClick="{{ p.add }}" aria-label="Thêm {{p.name}} vào giỏ" style="height: 44px; border-radius: 12px; border: 1.5px solid #1E5B3A; background: #FFFFFF; color: #1E5B3A; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                Thêm
+              </button>
+            </sc-if>
+            <sc-if value="{{ p.inCart }}" hint-placeholder-val="{{ false }}">
+              <div style="height: 44px; border-radius: 12px; background: #1E5B3A; color: #FFFFFF; display: flex; align-items: center; justify-content: space-between">
+                <button type="button" onClick="{{ p.sub }}" aria-label="Bớt một {{p.name}}" style="width: 44px; height: 44px; border: 0; background: transparent; color: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center">
+                  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg>
+                </button>
+                <span style="font-size: 15px; font-weight: 700">{{ p.qty }}</span>
+                <button type="button" onClick="{{ p.add }}" aria-label="Thêm một {{p.name}}" style="width: 44px; height: 44px; border: 0; background: transparent; color: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center">
+                  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                </button>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ hasCart }}" hint-placeholder-val="{{ true }}">
+    <a href="Cart.dc.html" style="position: absolute; left: 16px; right: 16px; bottom: 20px; height: 60px; padding: 0 18px; box-sizing: border-box; border-radius: 18px; background: #1C1C18; color: #FFFFFF; text-decoration: none; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 8px 24px rgba(28,28,24,0.25)">
+      <span style="display: flex; align-items: center; gap: 12px">
+        <span style="min-width: 28px; height: 28px; padding: 0 6px; box-sizing: border-box; border-radius: 999px; background: #F2C14E; color: #1C1C18; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center">{{ count }}</span>
+        <span style="display: flex; flex-direction: column">
+          <span style="font-size: 12px; color: #CFCFC6">Giỏ hàng</span>
+          <span style="font-size: 16px; font-weight: 700">{{ totalText }}</span>
+        </span>
+      </span>
+      <span style="display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600">
+        Xem giỏ
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </span>
+    </a>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { cat: 'all', cart: { w1: 2, c1: 1, s1: 1 } };
+  }
+  inc(id, d) {
+    var cart = Object.assign({}, this.state.cart);
+    var n = Math.max(0, (cart[id] || 0) + d);
+    if (n) { cart[id] = n; } else { delete cart[id]; }
+    this.setState({ cart: cart });
+  }
+  renderVals() {
+    var self = this;
+    var fmt = function (n) { return n.toLocaleString('vi-VN') + 'đ'; };
+    var CATS = [
+      { id: 'water', name: 'Nước', bg: '#E3EFF6', fg: '#1F5F86' },
+      { id: 'snack', name: 'Snack', bg: '#FBEBD9', fg: '#9A4A12' },
+      { id: 'coconut', name: 'Dừa', bg: '#E6F0DF', fg: '#3D6B2A' },
+      { id: 'essential', name: 'Thiết yếu', bg: '#EFE9F5', fg: '#5B4386' }
+    ];
+    var P = [
+      { id: 'w1', cat: 'water', name: 'Nước suối', unit: 'Chai 500ml', price: 5000 },
+      { id: 'w2', cat: 'water', name: 'Nước suối', unit: 'Chai 1,5L', price: 10000 },
+      { id: 'w3', cat: 'water', name: 'Nước khoáng có ga', unit: 'Lon 330ml', price: 12000 },
+      { id: 'w4', cat: 'water', name: 'Bình nước tinh khiết', unit: 'Bình 19L', price: 65000 },
+      { id: 's1', cat: 'snack', name: 'Bánh tráng trộn', unit: 'Túi 100g', price: 15000 },
+      { id: 's2', cat: 'snack', name: 'Snack khoai tây rong biển', unit: 'Gói 50g', price: 12000 },
+      { id: 's3', cat: 'snack', name: 'Đậu phộng rang muối', unit: 'Hũ 200g', price: 18000 },
+      { id: 's4', cat: 'snack', name: 'Khô gà lá chanh', unit: 'Hũ 200g', price: 45000 },
+      { id: 'c1', cat: 'coconut', name: 'Dừa xiêm Bến Tre', unit: '1 trái', price: 18000 },
+      { id: 'c2', cat: 'coconut', name: 'Dừa xiêm gọt sẵn, ướp lạnh', unit: '1 trái', price: 22000 },
+      { id: 'c3', cat: 'coconut', name: 'Nước dừa đóng chai', unit: 'Chai 330ml', price: 20000 },
+      { id: 'c4', cat: 'coconut', name: 'Cơm dừa sấy giòn', unit: 'Túi 100g', price: 35000 },
+      { id: 'e1', cat: 'essential', name: 'Gạo thơm', unit: 'Túi 5kg', price: 150000 },
+      { id: 'e2', cat: 'essential', name: 'Nước mắm cá cơm', unit: 'Chai 500ml', price: 38000 },
+      { id: 'e3', cat: 'essential', name: 'Trứng gà', unit: 'Vỉ 10 quả', price: 32000 },
+      { id: 'e4', cat: 'essential', name: 'Giấy vệ sinh', unit: 'Lốc 10 cuộn', price: 60000 }
+    ];
+    var cat = this.state.cat;
+    var cart = this.state.cart;
+    var catById = {};
+    CATS.forEach(function (c) { catById[c.id] = c; });
+    var flags = function (id) {
+      return { isWater: id === 'water', isSnack: id === 'snack', isCoconut: id === 'coconut', isEssential: id === 'essential' };
+    };
+    var cats = CATS.map(function (c) {
+      var active = c.id === cat;
+      return Object.assign({}, c, flags(c.id), {
+        ring: active ? c.fg : 'transparent',
+        pressed: active ? 'true' : 'false',
+        pick: function () { self.setState({ cat: active ? 'all' : c.id }); }
+      });
+    });
+    var items = P.filter(function (p) { return cat === 'all' || p.cat === cat; }).map(function (p) {
+      var qty = cart[p.id] || 0;
+      var c = catById[p.cat];
+      return Object.assign({}, p, flags(p.cat), {
+        bg: c.bg, fg: c.fg,
+        priceText: fmt(p.price),
+        qty: qty, inCart: qty > 0, notInCart: qty === 0,
+        add: function () { self.inc(p.id, 1); },
+        sub: function () { self.inc(p.id, -1); }
+      });
+    });
+    var count = 0, total = 0;
+    P.forEach(function (p) { var q = cart[p.id] || 0; count += q; total += q * p.price; });
+    return {
+      cats: cats,
+      items: items,
+      filtered: cat !== 'all',
+      sectionTitle: cat === 'all' ? 'Tất cả sản phẩm' : catById[cat].name,
+      showAll: function () { self.setState({ cat: 'all' }); },
+      pickCoconut: function () { self.setState({ cat: 'coconut' }); },
+      hasCart: count > 0,
+      count: count,
+      totalText: fmt(total)
+    };
+  }
+}
+</script>
+</body>
+</html>
