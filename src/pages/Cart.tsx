@@ -9,7 +9,7 @@ export function Cart() {
   const { lines, subtotal } = useCart()
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+    <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6">
       <h1 className="text-3xl font-semibold sm:text-4xl">Giỏ hàng</h1>
 
       {lines.length === 0 ? (
@@ -21,12 +21,12 @@ export function Cart() {
         </div>
       ) : (
         <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1fr_22rem]">
-          <ul className="divide-y divide-line border-y border-line">
+          <ul className="divide-y divide-line rounded-2xl border border-line bg-surface px-4">
             {lines.map((line) => (
               <CartLineRow key={line.key} line={line} />
             ))}
           </ul>
-          <section aria-label="Tóm tắt" className="space-y-4 rounded-lg bg-surface p-5">
+          <section aria-label="Tóm tắt" className="space-y-4 rounded-2xl border border-line bg-surface p-5">
             <div className="flex items-baseline justify-between">
               <span>Tạm tính</span>
               <span className="text-xl font-bold tabular-nums">{formatPrice(subtotal)}</span>

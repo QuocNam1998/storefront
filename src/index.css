@@ -66,23 +66,24 @@
 }
 
 :root {
-    /* Cửa hàng của Thy: calm water greens, one action color, one warm color for deals */
-    --mist: #EEF3F1;        /* page background */
-    --surface: #FAFCFB;     /* tiles, drawer, form fields, summary panels */
-    --ink: #1F3A3D;         /* text */
-    --ink-soft: #4F676A;    /* secondary text */
-    --sea: #2F7A6B;         /* the one action color */
-    --sea-deep: #235E52;    /* button hover, error text */
-    --apricot: #F2B880;     /* deals only */
-    --line: #D3DEDA;        /* dividers, input borders */
+    /* Cửa hàng của Thy: warm cream page, white cards, one forest-green action color, one yellow accent.
+       The names describe roles, not hues (decision 0006). */
+    --mist: #F7F5EE;        /* page background (cream) */
+    --surface: #FFFFFF;     /* cards, panels, drawer, form fields, header */
+    --ink: #1C1C18;         /* text, and the black cart button and cart bar */
+    --ink-soft: #5F5C53;    /* secondary text */
+    --sea: #1E5B3A;         /* the one action color (forest green) */
+    --sea-deep: #164A2E;    /* button hover, error text */
+    --apricot: #F2C14E;     /* yellow accent: deals, cart counts and the home banner button only */
+    --line: #E4E1D6;        /* dividers, card and input borders */
 
     /* Category colors: tile and placeholder background, and the icon on it */
-    --tint-snacks: #F7E3CF;
-    --tint-drinks: #D7EDF0;
-    --tint-essentials: #E4E2F0;
-    --icon-snacks: #9A5B2A;
-    --icon-drinks: #2C6E7A;
-    --icon-essentials: #5A5480;
+    --tint-snacks: #FBEBD9;
+    --tint-drinks: #E3EFF6;
+    --tint-essentials: #EFE9F5;
+    --icon-snacks: #9A4A12;
+    --icon-drinks: #24618A;
+    --icon-essentials: #5B4386;
 
     --background: var(--mist);
     --foreground: var(--ink);
@@ -170,6 +171,13 @@
     outline: 2px solid var(--sea);
     outline-offset: 2px;
     }
+}
+
+/* On phones, a control that gets focus scrolls clear of a bar fixed to the bottom of the screen. */
+@media (width < 48rem) {
+  html:has([data-bottom-bar]) {
+    scroll-padding-bottom: 6rem;
+  }
 }
 
 /* Shoppers who turn off motion get none, including the cart drawer's slide. */

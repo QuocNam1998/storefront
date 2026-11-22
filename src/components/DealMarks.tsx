@@ -1,7 +1,7 @@
 import type { Pack } from '@/data/catalog'
 import { discountPercent, formatPrice } from '@/lib/store'
 
-// Apricot marks deals and nothing else, so these two are the only places it's used.
+// The yellow accent marks deals, cart counts and the home banner button, and nothing else.
 
 /** The -N% badge in the corner of a deal's image. Shows nothing for a pack that isn't on a deal. */
 export function DealBadge({ pack }: { pack: Pack }) {

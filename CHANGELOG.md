@@ -5,6 +5,24 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-11-22
+
+### Changed
+
+- New look from Thy's mockups: a warm cream page, white rounded cards, deep forest green for actions and prices, and one yellow accent for deals, cart counts and the home banner.
+- The header has a basket logo mark, a wider search field and a black `Giỏ hàng` cart button with the count in a yellow circle. The row of category links under it is gone.
+- The home page opens with a green delivery banner, then shows all 24 products in one grid.
+- Product tiles have a full-width `Thêm vào giỏ` button that turns into a green `N trong giỏ` quantity bar, and the buttons in a row line up.
+- The product page has a breadcrumb, a category chip, large pack cards, an add button showing the total, and `Có thể bạn cũng thích` for similar products. On a phone it has no site header: back and cart buttons sit on the photo, and the add bar is fixed to the bottom of the screen.
+- Cart lines show the product's image, with the line total in green.
+
+### Added
+
+- From 1280 px, the home, category, deals and search pages have a category sidebar with product counts and a cart panel that stays in view. Below that, a row of category icon tiles.
+- On phones, a black cart bar fixed to the bottom of the shop pages once the cart has items.
+- `Mua ngay` on the product page adds the chosen pack and goes straight to checkout.
+- A delivery and payment card on every product page.
+
 ## [0.1.0] - 2026-11-22
 
 ### Changed

@@ -29,17 +29,17 @@ export function ProductTile({ product }: { product: Product }) {
 
   return (
     // Keeps the hidden "old price" label inside the tile, or a sideways row of tiles makes the whole page scroll on phones.
-    <article className="relative flex flex-col rounded-lg bg-surface p-3">
+    <article className="relative flex flex-col rounded-2xl border border-line bg-surface p-3">
       <Link to={`/p/${product.slug}`} className="group block rounded-md">
         <div className="relative">
-          <ProductImage product={product} packLabel={pack.label} />
+          <ProductImage product={product} />
           <DealBadge pack={pack} />
         </div>
-        <h3 className="mt-3 line-clamp-2 font-medium group-hover:underline">{product.name}</h3>
+        <h3 className="mt-3 line-clamp-2 font-semibold group-hover:underline">{product.name}</h3>
       </Link>
-      <p className="text-sm text-ink-soft">{pack.label}</p>
+      <p className="mt-1 text-sm text-ink-soft">{pack.label}</p>
       <p className="mt-1 flex flex-wrap items-baseline gap-x-2">
-        <span className="font-semibold tabular-nums">{formatPrice(pack.price)}</span>
+        <span className="text-lg font-bold text-sea tabular-nums">{formatPrice(pack.price)}</span>
         <OldPrice pack={pack} />
       </p>
       <p className="text-sm text-ink-soft tabular-nums">{formatUnitPrice(pack)}</p>
@@ -54,9 +54,12 @@ export function ProductTile({ product }: { product: Product }) {
               setQty(itemKey(product.id, pack.id), q)
             }}
             label={`Số lượng ${product.name}`}
+            filled
           />
         ) : (
           <Button
+            variant="outline"
+            className="h-10 w-full rounded-lg border-sea bg-surface font-semibold text-sea hover:bg-sea/10 hover:text-sea-deep"
             disabled={!inStock}
             onClick={() => {
               refocus.current = true
@@ -65,7 +68,9 @@ export function ProductTile({ product }: { product: Product }) {
             aria-label={`Thêm ${product.name} vào giỏ`}
           >
             <Plus aria-hidden="true" />
-            Thêm
+            <span>
+              Thêm<span className="hidden md:inline"> vào giỏ</span>
+            </span>
           </Button>
         )}
       </div>
