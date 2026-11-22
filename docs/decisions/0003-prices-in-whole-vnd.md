@@ -1,6 +1,6 @@
 # 0003. Prices in whole đồng
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-11-22
 - **Raised by:** grocery-store
 

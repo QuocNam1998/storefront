@@ -1,6 +1,6 @@
 # 0004. Vietnamese-only interface, written directly in components
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-11-22
 - **Raised by:** grocery-store
 

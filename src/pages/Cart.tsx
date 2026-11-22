@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
 import { CartLineRow } from '@/components/CartLineRow'
-import { FreeShippingNote } from '@/components/CartSheet'
+import { FreeDeliveryProgress } from '@/components/FreeDeliveryProgress'
+import { Button } from '@/components/ui/button'
 import { formatPrice } from '@/lib/store'
 import { useCart } from '@/store/cart'
 
@@ -9,39 +9,33 @@ export function Cart() {
   const { lines, subtotal } = useCart()
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-10 sm:px-6">
-      <h1 className="font-wide text-4xl font-black tracking-tight sm:text-5xl">Cart</h1>
+    <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+      <h1 className="text-3xl font-semibold sm:text-4xl">Giỏ hàng</h1>
 
       {lines.length === 0 ? (
         <div className="mt-8 max-w-md">
-          <p className="text-lg">Your cart is empty.</p>
+          <p className="text-lg">Giỏ hàng đang trống.</p>
           <Button asChild size="xl" className="mt-4">
-            <Link to="/shop?type=coffee">Browse coffees</Link>
+            <Link to="/">Tiếp tục mua sắm</Link>
           </Button>
         </div>
       ) : (
-        <div className="mt-8 grid gap-10 md:grid-cols-[1fr_340px]">
-          <ul className="divide-y divide-border border-y border-border">
+        <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1fr_22rem]">
+          <ul className="divide-y divide-line border-y border-line">
             {lines.map((line) => (
               <CartLineRow key={line.key} line={line} />
             ))}
           </ul>
-          <aside className="self-start rounded-md bg-parchment p-6" aria-label="Order summary">
+          <section aria-label="Tóm tắt" className="space-y-4 rounded-lg bg-surface p-5">
             <div className="flex items-baseline justify-between">
-              <span>Subtotal</span>
+              <span>Tạm tính</span>
               <span className="text-xl font-bold tabular-nums">{formatPrice(subtotal)}</span>
             </div>
-            <p className="mt-1 text-sm text-muted-foreground">Shipping is calculated at checkout.</p>
-            <div className="mt-3">
-              <FreeShippingNote subtotal={subtotal} />
-            </div>
-            <Button asChild size="xl" className="mt-6 w-full">
-              <Link to="/checkout">Check out</Link>
+            <FreeDeliveryProgress subtotal={subtotal} />
+            <Button asChild size="xl" className="w-full">
+              <Link to="/checkout">Thanh toán</Link>
             </Button>
-            <Link to="/shop" className="mt-4 block text-center text-sm underline underline-offset-4">
-              Keep shopping
-            </Link>
-          </aside>
+          </section>
         </div>
       )}
     </div>

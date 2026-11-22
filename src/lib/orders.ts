@@ -1,11 +1,10 @@
-import type { ShippingMethodId } from '@/lib/store'
-
-const STORAGE_KEY = 'second-crack.orders'
+// A new key, so orders saved by the old coffee store are never read.
+const STORAGE_KEY = 'thy-store.orders'
 
 export interface OrderLine {
   name: string
   slug: string
-  detail: string
+  packLabel: string
   qty: number
   lineTotal: number
 }
@@ -13,13 +12,17 @@ export interface OrderLine {
 export interface Order {
   id: string
   createdAt: string
-  roastDate: string
-  email: string
-  shipTo: { name: string; address: string; city: string; region: string; postalCode: string; country: string }
-  shippingMethod: ShippingMethodId
+  name: string
+  phone: string
+  email?: string
+  street: string
+  ward: string
+  province: string
+  note?: string
+  payment: 'cod'
   lines: OrderLine[]
   subtotal: number
-  shipping: number
+  delivery: number
   total: number
 }
 
@@ -44,5 +47,5 @@ export function getOrder(id: string): Order | undefined {
 }
 
 export function newOrderId(): string {
-  return `SC-${Math.floor(100000 + Math.random() * 900000)}`
+  return `THY-${Math.floor(100000 + Math.random() * 900000)}`
 }
