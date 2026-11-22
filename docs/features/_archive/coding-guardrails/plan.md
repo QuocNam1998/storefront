@@ -2,7 +2,7 @@
 
 ## Approach
 
-Write the rules down, check what can be checked mechanically, and add reuse and simplicity checks to the workflow, as recorded in [decision 0002](../../decisions/0002-kiss-and-dry-guardrails.md).
+Write the rules down, check what can be checked mechanically, and add reuse and simplicity checks to the workflow, as recorded in [decision 0002](../../../decisions/0002-kiss-and-dry-guardrails.md).
 
 - **Reused, not rebuilt:** the existing oxlint setup and its `pnpm lint` step in CI, the existing Vitest setup, the shadcn and Playwright MCP servers already in `.mcp.json`, and the two screen sizes already defined in `playwright.config.ts`. Nothing new is installed.
 - **Lint limits** are six rules added to `.oxlintrc.json`. Tried on 2026-11-22: with these limits, today's code reports no errors.
@@ -47,7 +47,8 @@ Write the rules down, check what can be checked mechanically, and add reuse and 
 - [x] 9. Add `pnpm build` to the checks in `/implement` (per step) and `/verify`. Covers R9, changed and R10, changed.
 - [x] 10. Add `.playwright-mcp/` to `.gitignore`. In the `storefront-ui` skill, save screenshots under `.playwright-mcp/visual-check/<feature>/` and drop the note about running after the browser tests. Do a visual check of one page, then run `pnpm test:e2e`: `git status` must be clean and the screenshots must still be there. Covers R14, R15.
 - [x] 11. Fix the KISS / DRY finding from the second `/verify` on 2026-11-22: the check line `pnpm test && pnpm test:e2e && pnpm lint && pnpm build` was written out in both `/implement` and `/verify`. Add a `check` script with that line to `package.json`, have both commands run `pnpm check`, and list it under Running in `docs/architecture.md`. Covers R9, R10.
-- [ ] 12. Check R2's CI part with a red run. Ask David first, as it pushes to GitHub. Push a throwaway branch that adds a 5-parameter function under `src/`, confirm the CI run fails at the lint step, then delete the branch locally and on GitHub. Covers R2.
+- [x] 12. Check R2's CI part with a red run. Ask David first, as it pushes to GitHub. Push a throwaway branch that adds a 5-parameter function under `src/`, confirm the CI run fails at the lint step, then delete the branch locally and on GitHub. Covers R2.
+  - Done 2026-11-22, approved by David. Branch `ci-red-lint-check` (commit `e39d4b1`) added `src/ci-red-check.ts` with a 5-parameter function. Run 44988899095 failed at `pnpm lint` with "src/ci-red-check.ts:1:24: Function 'tooMany' has too many parameters (5). Maximum allowed is 4", and build, tests and browser tests were skipped. The branch was then deleted locally and on GitHub. The feature branch's own run 44988886798 on `0580a0c` passed.
 
 ## Tests
 
