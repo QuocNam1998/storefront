@@ -10,22 +10,22 @@ Cửa hàng của Thy is a demo storefront for a small neighborhood grocery in V
 
 | Component | Location | Responsibility |
 |---|---|---|
-| App shell and routes | `src/App.tsx`, `src/main.tsx` | Sets up the routes and the shared layout (skip link, header, footer, cart drawer), and scrolls to the top on every page change |
+| App shell and routes | `src/App.tsx`, `src/main.tsx` | Sets up the routes and the shared layout (skip link, header, footer, cart drawer), and scrolls to the top on every page change. Home, category, deals and search sit inside the shop layout. On phones the layout leaves room under the footer whenever a bar is fixed to the bottom of the screen |
 | Pages | `src/pages/` | One file per route: `/` Home, `/c/:slug` Category, `/deals` Deals, `/search` Search, `/p/:slug` ProductPage, `/cart` Cart, `/checkout` Checkout, `/order/:id` OrderConfirmation, and NotFound for anything else |
 | Catalog | `src/data/catalog.ts` | Categories and subcategories (with their tint, icon color and icon), the 24 products with their packs (label, price, optional old price, amount and unit) and stock level, the stock wording, and lookups: by id or slug, by category, deals and similar products |
 | Cart store | `src/store/cart.tsx` | Cart state shared through React context: one line per product and pack, count, subtotal, drawer open or closed, add, quantity of a pack, change quantity (up to 99), remove, clear. Saved in localStorage under `thy-store.cart`; on load it drops items that are no longer in the catalog |
 | Store rules | `src/lib/store.ts` | Price formatting in whole đồng, unit price (per 100 g, per litre or per item) and its formatting, discount percent, delivery fee (20.000 ₫, free from 300.000 ₫) and the 2-hour delivery promise |
 | Search | `src/lib/search.ts` | Product search that ignores Vietnamese accents and case and lists name matches before subcategory and description matches |
 | Orders | `src/lib/orders.ts` | Creates order ids (`THY-` plus 6 digits), and saves and reads demo orders in localStorage under `thy-store.orders` |
-| Site components | `src/components/` | Header (search, category nav, cart button) and footer, cart drawer and cart line, product tile, product grid, product image (photo or category-colored placeholder), deal badge and old price, free-delivery progress, order totals, quantity stepper |
+| Site components | `src/components/` | Header (logo, search, black cart button with the yellow count; hidden on the product page on phones) and footer, the category links with their counts and the category icon row shown below desktop width, the shop layout (category sidebar and cart panel from 1280 px, cart bar fixed to the bottom on phones), cart drawer and cart line, product tile, product grid, product image (photo or category-colored placeholder), deal badge and old price, free-delivery progress, order totals, quantity stepper (with a full-width green variant for tiles) |
 | UI kit | `src/components/ui/` | shadcn/ui components built on Radix |
-| Design tokens | `src/index.css` | Tailwind v4 theme: palette (including the category tints), the Be Vietnam Pro font, and no motion under reduced motion |
+| Design tokens | `src/index.css` | Tailwind v4 theme: palette (cream page, white cards, forest-green action color, one yellow accent, the category tints; the token names describe roles, not hues, per [decision 0006](decisions/0006-keep-theme-token-names-through-the-redesign.md)), the Be Vietnam Pro font, scroll padding that keeps focused controls clear of a fixed bottom bar on phones, and no motion under reduced motion |
 
 ## Data flow
 
 1. On page load the cart store reads the saved cart from localStorage, keeping only items that still match the catalog. A cart saved by the old coffee store uses a different key and is never read.
 2. Pages read products straight from the catalog. The category page keeps its subcategory filter, sort and in-stock option in the URL query string, and search keeps its query there, so a view can be shared or reloaded.
-3. Adding to the cart from a tile or a product page updates the cart store, which saves to localStorage on every change. The header count, the tiles' quantity controls and the cart drawer update with it.
+3. Adding to the cart from a tile or a product page updates the cart store, which saves to localStorage on every change. The header count, the tiles' quantity controls, the cart drawer, the desktop cart panel and the phone cart bar update with it. `Mua ngay` on a product page adds the same way, then goes to checkout.
 4. Checkout checks the name, phone number, optional email and the two-level address, and moves focus to the first problem. When the form is valid it works out the delivery fee with the store rules, builds the order, saves it to localStorage, empties the cart and replaces the page with `/order/:id`.
 5. The order confirmation page reads the order back from localStorage by its id.
 

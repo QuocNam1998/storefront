@@ -1,5 +1,6 @@
 import { useParams, useSearchParams } from 'react-router-dom'
 import { ProductGrid } from '@/components/ProductGrid'
+import { CategoryIconRow } from '@/components/SiteChrome'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
@@ -53,7 +54,8 @@ export function Category() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+    <div>
+      <CategoryIconRow />
       <h1 className="text-3xl font-semibold sm:text-4xl">{category.name}</h1>
 
       <div className="mt-6 space-y-4 border-b border-line pb-4">

@@ -48,10 +48,11 @@ for (const path of PAGES) {
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     })
 
-    test('carries the store name and is in Vietnamese', async ({ page }) => {
+    test('carries the store name and is in Vietnamese', async ({ page, isMobile }) => {
       await expect(page).toHaveTitle(/Cửa hàng của Thy/)
       await expect(page.locator('html')).toHaveAttribute('lang', 'vi')
-      await expect(page.getByRole('banner')).toContainText('Cửa hàng của Thy')
+      // On a phone the product page has no site header: its photo carries back and cart buttons instead.
+      if (!(isMobile && path.startsWith('/p/'))) await expect(page.getByRole('banner')).toContainText('Cửa hàng của Thy')
       await expect(page.getByRole('contentinfo')).toContainText('Cửa hàng của Thy')
     })
 
@@ -82,19 +83,22 @@ for (const path of PAGES) {
   })
 }
 
-test('the background, action and deal colors differ, and the deal color marks only deals', async ({ page }) => {
+test('the background, action and accent colors differ, and the accent marks only deals, cart counts and the home banner', async ({ page }) => {
   await page.goto('/')
   const colors = await page.locator('body').evaluate((body) => {
     const apricot = getComputedStyle(body.querySelector('.bg-apricot') as Element).backgroundColor
+    const banner = [...body.querySelectorAll('section')].find((s) => s.querySelector('h1')?.textContent === 'Giao hàng trong 2 giờ')
     const misplaced = [...body.querySelectorAll('*')].filter((el) => {
       const s = getComputedStyle(el)
       const usesApricot = [s.backgroundColor, s.color, s.borderTopColor].includes(apricot) || (el.tagName !== 'S' && s.textDecorationColor === apricot && s.textDecorationLine !== 'none')
       const isDeal = /^-\d+%$/.test(el.textContent ?? '') || el.tagName === 'S'
-      return usesApricot && !isDeal
+      const isCartCount = !!el.closest('[aria-label^="Mở giỏ hàng"], [aria-label^="Xem giỏ"]')
+      const isBanner = !!banner?.contains(el)
+      return usesApricot && !isDeal && !isCartCount && !isBanner
     })
     return {
       background: getComputedStyle(body).backgroundColor,
-      action: getComputedStyle(body.querySelector('button[type=submit]') as Element).backgroundColor,
+      action: getComputedStyle(body.querySelector('header .bg-sea') as Element).backgroundColor,
       deal: apricot,
       misplaced: misplaced.map((el) => el.outerHTML.slice(0, 80)),
     }
@@ -169,4 +173,24 @@ test('a shopper can search, add, open the cart and order with the keyboard alone
 
   await expect(page).toHaveURL(/\/order\/THY-\d{6}$/)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cảm ơn Lê Thu Hà!')
+})
+
+test('on a phone, a control reached by keyboard is never hidden behind the cart bar', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'The cart bar is for phones')
+  await page.goto('/c/do-an-vat')
+  await page.getByRole('button', { name: 'Thêm Khoai tây chiên vị tảo biển vào giỏ' }).click()
+  const bar = page.getByRole('link', { name: /^Xem giỏ hàng, \d+ món/ })
+  await expect(bar).toBeVisible()
+
+  // Put the button on screen but behind the bar: a browser only scrolls a focused control it thinks is out of view.
+  const tile = page.getByRole('article').filter({ hasText: 'Kẹo dẻo trái cây' })
+  const button = tile.getByRole('button', { name: 'Thêm Kẹo dẻo trái cây vào giỏ' })
+  await button.evaluate((el) => window.scrollBy(0, el.getBoundingClientRect().bottom - (window.innerHeight - 10)))
+  await tile.getByRole('link').focus()
+  await page.keyboard.press('Tab')
+  await expect(button).toBeFocused()
+
+  const [buttonBox, barBox] = [await button.boundingBox(), await bar.boundingBox()]
+  if (!buttonBox || !barBox) throw new Error('the button or the bar is not on screen')
+  expect(buttonBox.y + buttonBox.height).toBeLessThanOrEqual(barBox.y)
 })

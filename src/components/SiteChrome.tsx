@@ -1,16 +1,26 @@
-import { Search, ShoppingBasket } from 'lucide-react'
+import { BadgePercent, Search, ShoppingBasket, ShoppingCart } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
-import { Link, NavLink, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, NavLink, useMatch, useNavigate, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { categories } from '@/data/catalog'
+import { categories, dealProducts, productsInCategory } from '@/data/catalog'
 import { DELIVERY_PROMISE, FREE_DELIVERY_RULE } from '@/lib/store'
 import { useCart } from '@/store/cart'
 import { cn } from '@/lib/utils'
 
 const STORE_NAME = 'Cửa hàng của Thy'
 
-const NAV_LINKS = [...categories.map((c) => ({ to: `/c/${c.slug}`, label: c.name })), { to: '/deals', label: 'Ưu đãi' }]
+export const NAV_LINKS = [
+  ...categories.map((c) => ({
+    to: `/c/${c.slug}`,
+    label: c.name,
+    icon: c.subcategories[0].icon,
+    tint: c.tint,
+    iconColor: c.iconColor,
+    count: productsInCategory(c.id).length,
+  })),
+  { to: '/deals', label: 'Ưu đãi', icon: BadgePercent, tint: 'border border-line bg-surface', iconColor: 'text-sea', count: dealProducts.length },
+]
 
 function SearchForm() {
   const navigate = useNavigate()
@@ -32,10 +42,11 @@ function SearchForm() {
   }
 
   return (
-    <form role="search" onSubmit={submit} className="order-last flex w-full gap-2 md:order-none md:w-auto md:flex-1">
+    <form role="search" onSubmit={submit} className="relative order-last w-full md:order-none md:w-auto md:flex-1">
       <label htmlFor="site-search" className="sr-only">
         Tìm sản phẩm
       </label>
+      <Search aria-hidden="true" className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-ink-soft" />
       <Input
         id="site-search"
         name="q"
@@ -43,55 +54,63 @@ function SearchForm() {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Tìm đồ ăn vặt, nước uống, nhu yếu phẩm…"
-        className="h-10 bg-surface"
+        className="h-11 rounded-xl bg-mist pl-10"
       />
-      <Button type="submit" size="icon-lg" className="size-10 shrink-0" aria-label="Tìm">
-        <Search aria-hidden="true" />
-      </Button>
     </form>
+  )
+}
+
+/** The yellow circle with the number of items in the cart. */
+export function CartCount({ count }: { count: number }) {
+  return <span className="grid size-6 place-items-center rounded-full bg-apricot text-sm font-bold text-ink tabular-nums">{count}</span>
+}
+
+/** Below desktop width, the categories and deals as a row of tinted icon tiles. */
+export function CategoryIconRow() {
+  return (
+    <nav aria-label="Danh mục" className="mb-8 xl:hidden">
+      <ul className="grid grid-cols-4 gap-3">
+        {NAV_LINKS.map((link) => (
+          <li key={link.to}>
+            <NavLink to={link.to} className="group flex flex-col items-center gap-2 rounded-xl text-center text-sm font-semibold">
+              <span className={cn('grid aspect-square w-full max-w-24 place-items-center rounded-2xl group-aria-[current=page]:ring-2 group-aria-[current=page]:ring-sea', link.tint)}>
+                <link.icon aria-hidden="true" className={cn('size-8', link.iconColor)} strokeWidth={1.75} />
+              </span>
+              {link.label}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+    </nav>
   )
 }
 
 export function SiteHeader() {
   const { count, setOpen } = useCart()
+  // On a phone the product page puts its own back and cart buttons over the photo instead.
+  const onProductPage = useMatch('/p/:slug') !== null
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-mist">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-3 px-4 pt-3 sm:px-6">
-        <Link to="/" className="mr-auto rounded-md text-lg font-semibold md:mr-0">
+    <header className={cn('sticky top-0 z-40 border-b border-line bg-surface', onProductPage && 'max-md:hidden')}>
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-6">
+        <Link to="/" className="mr-auto flex items-center gap-2.5 rounded-md text-xl font-bold text-sea md:mr-0">
+          <span className="grid size-10 place-items-center rounded-xl bg-sea text-surface">
+            <ShoppingBasket aria-hidden="true" className="size-5" />
+          </span>
           {STORE_NAME}
         </Link>
         <SearchForm />
         <Button
           type="button"
           size="lg"
-          variant="outline"
           onClick={() => setOpen(true)}
-          className="h-10 bg-surface px-3"
+          className="h-11 gap-2.5 rounded-xl bg-ink px-4 text-surface hover:bg-ink/85"
           aria-label={`Mở giỏ hàng, ${count} món`}
         >
-          <ShoppingBasket aria-hidden="true" />
-          <span className="font-semibold tabular-nums">{count}</span>
+          <ShoppingCart aria-hidden="true" />
+          <span className="hidden font-semibold md:inline">Giỏ hàng</span>
+          <CartCount count={count} />
         </Button>
       </div>
-      <nav aria-label="Danh mục" className="mx-auto max-w-6xl overflow-x-auto px-4 sm:px-6">
-        <ul className="flex gap-1 py-2 whitespace-nowrap">
-          {NAV_LINKS.map((link) => (
-            <li key={link.to}>
-              <NavLink
-                to={link.to}
-                className={({ isActive }) =>
-                  cn(
-                    'block rounded-md px-3 py-1.5 font-medium hover:bg-surface',
-                    isActive && 'bg-surface text-sea-deep',
-                  )
-                }
-              >
-                {link.label}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
     </header>
   )
 }
@@ -99,9 +118,9 @@ export function SiteHeader() {
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-line bg-surface">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[2fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[2fr_1fr_1fr]">
         <div className="max-w-sm">
-          <p className="text-xl font-semibold">{STORE_NAME}</p>
+          <p className="text-xl font-bold text-sea">{STORE_NAME}</p>
           <p className="mt-3 text-ink-soft">
             {DELIVERY_PROMISE}. {FREE_DELIVERY_RULE}.
           </p>
@@ -131,7 +150,7 @@ export function SiteFooter() {
           </ul>
         </div>
       </div>
-      <p className="mx-auto max-w-6xl px-4 pb-8 text-sm text-ink-soft sm:px-6">
+      <p className="mx-auto max-w-7xl px-4 pb-8 text-sm text-ink-soft sm:px-6">
         Đây là cửa hàng demo. Đơn hàng chỉ được lưu trong trình duyệt này và không có thanh toán thật.
       </p>
     </footer>
