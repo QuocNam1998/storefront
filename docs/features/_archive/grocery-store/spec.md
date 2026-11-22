@@ -170,7 +170,7 @@ This feature replaces the coffee catalog and the coffee-specific behavior with a
 - **R21:** Given a subtotal of 299.999 ₫, then delivery is 20.000 ₫. Given 300.000 ₫, then delivery is free and shows `Miễn phí`. The total is always the subtotal plus delivery.
 - **R22:** Given the home page, checkout and an order confirmation, then each shows `Giao hàng trong 2 giờ`, and checkout has no control for choosing a day or time.
 - **R23**
-  - Given an empty form, when I place the order, then the page says 6 fields need attention, each required field shows a Vietnamese message, and focus moves to `Họ và tên`.
+  - Given an empty form, when I place the order, then the page says 5 fields need attention (`Họ và tên`, `Số điện thoại`, `Số nhà, tên đường`, `Phường/Xã` and `Tỉnh/Thành phố`), each shows a Vietnamese message, and focus moves to `Họ và tên`.
   - Given the phone `090 123 4567` or `+84 90.123.4567`, then it's accepted. Given `12345`, then it isn't.
   - Given `Khác` is chosen for the province and the province name is left empty, then the order isn't placed and that field shows a message.
   - The form has no district or postal-code field.
