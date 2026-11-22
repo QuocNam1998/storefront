@@ -18,20 +18,25 @@ Replace the coffee storefront with a grocery store while keeping its architectur
 
 **Data.** A new catalog (`src/data/catalog.ts`) has 3 categories, 12 subcategories and the 24 products from the spec appendix.
 A product has one or more **packs**. Each pack has a label, a price in whole đồng (decision 0003), an optional old price (`wasPrice`) that makes it a deal, and its total `amount` in a `unit` of `g`, `ml` or `item` (with an `itemLabel` such as `cuộn` for items).
-Unit price, discount and price formatting are pure functions in `src/lib/format.ts`. Delivery rules (20.000 ₫, free from 300.000 ₫, the 2-hour promise) live in `src/lib/store.ts`.
+Price formatting, unit price, discount and the delivery rules (20.000 ₫, free from 300.000 ₫, the 2-hour promise) are pure functions in `src/lib/store.ts`, the one home for store rules.
 Search (`src/lib/search.ts`) normalizes both sides by removing accents with NFD, mapping `đ`/`Đ` to `d` and lowercasing, then ranks name matches above subcategory and description matches.
 
 **Cart.** A line's key becomes `productId|packId`. Grind is gone, the per-line limit goes from 20 to 99, and the storage key changes to `thy-store.cart`, so a coffee cart is never read.
 The store gains `getQty(productId, packId)` so product tiles can show their own quantity control.
 **Orders** use `THY-` ids and the storage key `thy-store.orders`, and record the phone number, the two-level address, an optional note, `payment: 'cod'` and pack labels.
 
-**Switch-over.** The cart's shape changes, and every page uses the cart, so the coffee UI can't keep working alongside the new code.
-- Steps 2–6 add the new pure modules and theme next to the coffee code, which keeps working.
-- Step 7 switches the cart, swaps the routes to the grocery set with minimal placeholder pages, and deletes the coffee data, pages, components and the coffee browser test.
-- Steps 8–17 fill in the real components and pages one at a time. Each step adds its own tests.
-`pnpm build` and `pnpm test` pass after every step. `pnpm test:e2e` has no tests between step 7 and step 12, where the first grocery browser test arrives. That is expected.
+**Reuse.**
+- `src/pages/Shop.tsx` becomes `src/pages/Category.tsx`. Its URL-param helpers (`readList` and the param update), `sortProducts`, `FilterGroup` and `FilterCheckbox` are what the category filters need.
+- `ProductTile`, `QuantityStepper`, `CartLineRow`, `CartSheet`, `SiteChrome`, the cart store, `orders.ts` and every page are changed, not replaced.
+- shadcn `Select`, `Checkbox`, `ToggleGroup`, `Sheet` and `Button` are already in `src/components/ui/`. Only `Progress` and `Textarea` are new.
 
-**Design** (follow the frontend-design skill; this is its plan, already reviewed against generic defaults)
+**Switch-over.** The cart's shape changes, and every page uses the cart, so the coffee UI can't keep working alongside the new code.
+- Steps 2–6 add the new pure functions and theme next to the coffee code, which keeps working. `formatPrice` keeps formatting US cents until step 7, because the coffee pages still use it.
+- Step 7 switches the cart and `formatPrice`, swaps the routes to the grocery set with minimal placeholder pages, and deletes the coffee data, components and the coffee browser test.
+- Steps 8–17 fill in the real components and pages one at a time. Each step adds its own tests.
+`pnpm check` passes after every step. Step 6 starts `e2e/quality.spec.ts` with the R1 title and language checks, so there is always at least one browser test (Playwright fails when it finds none).
+
+**Design.** Step 6 follows the frontend-design skill, and this section is its plan, already reviewed against generic defaults. Step 6 also rewrites the storefront-ui skill to describe this look. Steps 8–19 then follow storefront-ui.
 
 | Token | Hex | Use |
 |---|---|---|
@@ -44,13 +49,13 @@ The store gains `getQty(productId, packId)` so product tiles can show their own 
 | `--apricot` | `#F2B880` | Deals only: discount badge (ink text on it) and the struck-through old price marker |
 | `--line` | `#D3DEDA` | Dividers, input borders |
 
-Category tints (tile background, placeholder image, home section band) and their icon colors:
+Category tints (tile background, placeholder image, home section band) and their icon colors. They are tokens in `src/index.css`, like the rest of the palette. The catalog names the full classes (`bg-tint-snacks`, `text-icon-snacks`) so Tailwind finds them, and holds no hex values.
 
-| Category | Tint | Icon color |
-|---|---|---|
-| Snacks | `#F7E3CF` | `#9A5B2A` |
-| Water & drinks | `#D7EDF0` | `#2C6E7A` |
-| Essentials | `#E4E2F0` | `#5A5480` |
+| Category | Tint token | Tint | Icon token | Icon color |
+|---|---|---|---|---|
+| Snacks | `--tint-snacks` | `#F7E3CF` | `--icon-snacks` | `#9A5B2A` |
+| Water & drinks | `--tint-drinks` | `#D7EDF0` | `--icon-drinks` | `#2C6E7A` |
+| Essentials | `--tint-essentials` | `#E4E2F0` | `--icon-essentials` | `#5A5480` |
 
 Map the shadcn variables onto these tokens in `src/index.css`:
 - `--background` → mist
@@ -92,36 +97,35 @@ Tile    │ [-15%] (icon on tint, pack label at foot)                           
 
 | File | What |
 |---|---|
-| `src/data/catalog.ts` | Types (`CategoryId`, `Category`, `Subcategory`, `Unit`, `Pack`, `Product` with optional `image`), the 3 categories with tints, icon colors and slugs (`do-an-vat`, `nuoc-uong`, `nhu-yeu-pham`), the 24 products, and lookups `getProductById`, `getProductBySlug`, `getCategoryBySlug`, `productsInCategory`, `dealProducts`, `similarProducts` |
+| `src/data/catalog.ts` | Replaces `products.ts`, whose coffee shape can't hold packs. Types (`CategoryId`, `Category`, `Subcategory`, `Unit`, `Pack`, `Product` with optional `image`), the 3 categories with their tint and icon class names and slugs (`do-an-vat`, `nuoc-uong`, `nhu-yeu-pham`), the 24 products, and lookups `getProductById`, `getProductBySlug`, `getCategoryBySlug`, `productsInCategory`, `dealProducts`, `similarProducts` |
 | `src/data/catalog.test.ts` | Catalog shape tests |
-| `src/lib/format.ts` | `formatPrice`, `unitPrice(pack)`, `formatUnitPrice(pack)`, `discountPercent(pack)` |
-| `src/lib/format.test.ts` | |
-| `src/lib/search.ts` | `normalize(text)`, `searchProducts(query)` |
+| `src/lib/search.ts` | Nothing searches today (R12). `searchProducts(query)`, with accent removal kept private to the file |
 | `src/lib/search.test.ts` | |
 | `src/lib/orders.test.ts` | Id format, save/read round trip, unknown id |
-| `src/components/ProductImage.tsx` | Placeholder (tint, subcategory icon, pack label) or `<img>` when `product.image` is set |
+| `src/components/ProductImage.tsx` | Used by tiles and the product page (R11). Placeholder (tint, subcategory icon, pack label) or `<img>` when `product.image` is set |
 | `src/components/ProductImage.test.tsx` | |
 | `src/components/ProductTile.test.tsx` | Add, stepper, deal, stock states |
-| `src/components/FreeDeliveryProgress.tsx` | Message plus shadcn `Progress` |
+| `src/components/FreeDeliveryProgress.tsx` | Used by the drawer and the cart page (R20). Message plus shadcn `Progress` |
 | `src/components/FreeDeliveryProgress.test.tsx` | |
-| `src/components/ui/progress.tsx`, `src/components/ui/textarea.tsx` | Added with the shadcn MCP or `pnpm dlx shadcn@latest add progress textarea` |
-| `src/pages/Category.tsx` | `/c/:slug` |
-| `src/pages/Deals.tsx` | `/deals` |
-| `src/pages/Search.tsx` | `/search?q=` |
+| `src/components/ui/progress.tsx`, `src/components/ui/textarea.tsx` | For R20 and the checkout note (R23). Added with the shadcn MCP or `pnpm dlx shadcn@latest add progress textarea` |
+| `src/pages/Category.tsx` | `/c/:slug`. Renamed from `Shop.tsx` in step 7, keeping its filter helpers |
+| `src/pages/Deals.tsx` | `/deals` (R9) |
+| `src/pages/Search.tsx` | `/search?q=` (R12) |
 | `e2e/browse.spec.ts` | Search, category filters, deals, product page, tile stepper, stock |
-| `e2e/quality.spec.ts` | Brand and language, no coffee text, axe scan, no horizontal scroll, keyboard order, reduced motion |
+| `e2e/quality.spec.ts` | Started in step 6 with the R1 checks. Brand and language, no coffee text, axe scan, no horizontal scroll, keyboard order, reduced motion |
 | `docs/decisions/0003-prices-in-whole-vnd.md`, `0004-vietnamese-only-interface.md`, `0005-axe-for-accessibility-checks.md` | Already written with this plan, status `proposed` |
 
 **Change**
 
 | File | What changes |
 |---|---|
-| `package.json`, `pnpm-lock.yaml` | Add `@fontsource/be-vietnam-pro` and `@axe-core/playwright` (dev). Remove `@fontsource-variable/archivo`. In the last step, set version to `0.1.0`. |
+| `package.json`, `pnpm-lock.yaml` | Add `@fontsource/be-vietnam-pro` (the one typeface, with full Vietnamese glyphs) and `@axe-core/playwright` (dev, decision 0005). Remove `@fontsource-variable/archivo`. In the last step, set version to `0.1.0`. |
 | `index.html` | `lang="vi"`, title `Cửa hàng của Thy`, Vietnamese meta description, `theme-color` `#EEF3F1` |
 | `public/favicon.svg` | Simple basket in sea green |
-| `src/index.css` | New tokens and font. Remove the Archivo import, `font-wide`, `font-condensed`, the `--bean`/`--parchment`/`--roast`/`--cherry` tokens, and the `shelf-rise` keyframes. |
-| `src/lib/store.ts` | Add `DELIVERY_FEE = 20000`, `FREE_DELIVERY_THRESHOLD = 300000`, `deliveryFee(subtotal)`, `amountToFreeDelivery(subtotal)`, `DELIVERY_PROMISE = 'Giao hàng trong 2 giờ'`. Remove `formatPrice` (moved to `format.ts`), `nextRoastDate`, `formatDay`, `SHIPPING_METHODS` and `shippingCost` in step 7. |
-| `src/lib/store.test.ts` | Rewritten for the delivery rules. The roast-date tests are removed. |
+| `src/index.css` | New tokens (including the category tint and icon tokens) and font. Remove the Archivo import, `font-wide`, `font-condensed`, the `--bean`/`--parchment`/`--roast`/`--cherry` tokens, and the `shelf-rise` keyframes. |
+| `.claude/skills/storefront-ui/SKILL.md` | Step 6: describe the new look (store name, tokens, Be Vietnam Pro, no load animations, no shadows). Remove Archivo, `shelf-rise` and the `ProductArt`/`RoastScale` exception. |
+| `src/lib/store.ts` | Add `unitPrice(pack)`, `discountPercent(pack)`, `DELIVERY_FEE = 20000`, `FREE_DELIVERY_THRESHOLD = 300000`, `deliveryFee(subtotal)`, `amountToFreeDelivery(subtotal)`, `DELIVERY_PROMISE = 'Giao hàng trong 2 giờ'`. In step 7, switch `formatPrice` to whole đồng (decision 0003), add `formatUnitPrice(pack)`, and remove `nextRoastDate`, `formatDay`, `SHIPPING_METHODS` and `shippingCost`. |
+| `src/lib/store.test.ts` | Rewritten for the price and delivery rules. The roast-date tests are removed. |
 | `src/lib/orders.ts` | New `Order` shape (name, phone, email?, street, ward, province, note?, `payment: 'cod'`, lines with pack label), `THY-` ids, `thy-store.orders` |
 | `src/store/cart.tsx` | `packId` instead of `sizeId`/`grind`, `MAX_QTY = 99`, `thy-store.cart`, `getQty`, lookups from `catalog.ts` |
 | `src/store/cart.test.tsx` | Rewritten for packs, 99, reload, unknown items, old coffee key |
@@ -137,28 +141,34 @@ Tile    │ [-15%] (icon on tint, pack label at foot)                           
 | `docs/architecture.md` | **This change makes these sections untrue:** Purpose (coffee roaster), Components (pages and routes, catalog, cart limit and key, store rules, orders, site components, design tokens), Data flow (shop filters, shipping, form fields), Tech stack (Archivo, add axe-core), Known concerns (the Monday roast-date item no longer applies). Update them in the last step. |
 | `docs/features/INDEX.md` | Status changes as the work moves along |
 
-**Delete:** `src/data/products.ts`, `src/components/ProductArt.tsx`, `src/components/RoastScale.tsx`, `src/pages/Shop.tsx`, `e2e/checkout.spec.ts` (step 7; step 17 brings back a grocery `e2e/checkout.spec.ts`).
+**Delete:** `src/data/products.ts`, `src/components/ProductArt.tsx`, `src/components/RoastScale.tsx`, `e2e/checkout.spec.ts` (step 7; step 17 brings back a grocery `e2e/checkout.spec.ts`). `src/pages/Shop.tsx` is renamed, not deleted.
 
 ## Steps
 
 - [ ] 1. Check out branch `feature/grocery-store`, which already holds this spec, plan and decisions, and bring it up to date with `main`. Add `@fontsource/be-vietnam-pro` and `@axe-core/playwright` (dev). Add the shadcn `progress` and `textarea` components. Change no behavior. (setup)
-- [ ] 2. Add `src/lib/format.ts` and its tests: `formatPrice` (decision 0003), `unitPrice`/`formatUnitPrice` for `g` (per 100 g), `ml` (per L) and `item` (per `itemLabel`), and `discountPercent`. (R7, R8, R9)
+- [ ] 2. Add `unitPrice` for `g` (per 100 g), `ml` (per L) and `item` (per `itemLabel`) and `discountPercent` to `src/lib/store.ts`, with tests. Both return numbers, so the coffee prices are untouched. (R8, R9)
 - [ ] 3. Add `src/data/catalog.ts` with the categories, subcategories, the 24 appendix products (with short Vietnamese descriptions), stock levels and lookups, plus its tests. Nothing imports it yet. (R5, R6, R9, R10)
 - [ ] 4. Add the delivery rules and promise to `src/lib/store.ts` beside the old shipping code, with tests. (R21, R22)
 - [ ] 5. Add `src/lib/search.ts` (accent- and case-insensitive, name matches first) and its tests. (R12)
-- [ ] 6. Theme: tokens, font and favicon in `src/index.css`, `index.html` and `public/favicon.svg`. Set `lang="vi"` and the new title. Remove Archivo and its utilities. The coffee pages still build and work, just unstyled in places. (R1, R3, R4)
+- [ ] 6. Theme:
+  - Tokens (including the category tint and icon tokens), font and favicon in `src/index.css`, `index.html` and `public/favicon.svg`. Set `lang="vi"` and the new title. Remove Archivo and its utilities.
+  - Rewrite the storefront-ui skill for the new look.
+  - Start `e2e/quality.spec.ts` with the R1 title and `html[lang=vi]` checks.
+  The coffee pages still build and work, just unstyled in places. (R1, R3, R4)
 - [ ] 7. Switch-over:
   - Change `cart.tsx` to packs, 99 per line, `thy-store.cart` and `getQty`, and rewrite `cart.test.tsx`.
+  - Switch `formatPrice` to whole đồng and add `formatUnitPrice`, with tests. (R7, R8)
   - Point `CartLineRow` and `CartSheet` at the catalog's packs.
   - Replace `App.tsx` routes with the grocery set, with every page a minimal placeholder (Vietnamese heading only).
-  - Delete the coffee data, pages, components and `e2e/checkout.spec.ts`.
+  - Rename `Shop.tsx` to `Category.tsx` as the category placeholder. Keep `readList`, the param update, `sortProducts`, `FilterGroup` and `FilterCheckbox`, and drop the coffee filters.
+  - Delete the coffee data, the other coffee pages and components, and `e2e/checkout.spec.ts`.
   - Remove `nextRoastDate`, `formatDay`, `SHIPPING_METHODS` and `shippingCost` and their tests.
-  `pnpm build` and `pnpm test` pass. (R17, R18, R19, R27)
+  (R7, R8, R17, R18, R19, R27)
 - [ ] 8. `ProductImage` (placeholder by category tint and subcategory icon; `<img>` with alt text when `image` is set) and its tests. (R11)
 - [ ] 9. `ProductTile` and its tests: price, old price with `-N%` badge, unit price, `Sắp hết hàng`/`Hết hàng`, `Thêm` → stepper → back to `Thêm` at 0. Out-of-stock tiles have no enabled add control. Update `QuantityStepper` labels. (R8, R9, R10, R16)
 - [ ] 10. Header (search form to `/search?q=`, category nav with active state, cart button) and footer in `SiteChrome.tsx`. (R1, R2, R12)
 - [ ] 11. Home page: delivery strip, category tiles, deals row and one tinted band per category with `Xem tất cả`. (R14, R22, R3)
-- [ ] 12. Category page: subcategory toggle, sort (popular, price ascending and descending, unit price), in-stock-only checkbox, all in the URL, and an empty state. Start `e2e/browse.spec.ts` with the R13 cases. (R13)
+- [ ] 12. Category page, built on the helpers kept from `Shop.tsx`: subcategory toggle, sort (popular, price ascending and descending, unit price), in-stock-only checkbox, all in the URL, and an empty state. Start `e2e/browse.spec.ts` with the R13 cases. (R13)
 - [ ] 13. Deals page and search page, including the no-results message with category links. Add their cases to `e2e/browse.spec.ts`. (R9, R12)
 - [ ] 14. Product page: pack toggle (label and price), price and unit price for the chosen pack, stock state, quantity, `Thêm vào giỏ` (opens the drawer), description and `Sản phẩm tương tự`. Add the R15, R10 and R16 cases to `e2e/browse.spec.ts`. (R10, R15, R16)
 - [ ] 15. Cart drawer and cart page in Vietnamese, with `FreeDeliveryProgress` and its tests. (R18, R20)
@@ -171,7 +181,7 @@ Tile    │ [-15%] (icon on tint, pack label at foot)                           
   - Update `orders.ts` (new shape, `THY-` ids, `thy-store.orders`) and add `orders.test.ts`.
   (R21, R22, R23, R24, R25)
 - [ ] 17. Order confirmation (thanks by name, promise, phone, address, lines with packs, totals, `Tiếp tục mua sắm`, not-found message) and NotFound in Vietnamese. Add `e2e/checkout.spec.ts`: the full order from R25 plus the R23 empty-form, phone and `Khác` cases. (R22, R23, R25)
-- [ ] 18. Add `e2e/quality.spec.ts`:
+- [ ] 18. Fill in `e2e/quality.spec.ts`:
   - name, title and `lang="vi"` on every page
   - no coffee words or `$` on every page
   - an axe scan per page
@@ -184,7 +194,7 @@ Tile    │ [-15%] (icon on tint, pack label at foot)                           
   - Update `docs/architecture.md` (Purpose, Components, Data flow, Tech stack, Known concerns).
   - Update `README.md` and replace the screenshots.
   - Add the `0.1.0` entry to `CHANGELOG.md` and set `version` to `0.1.0` in `package.json`.
-  - Run `pnpm lint && pnpm build && pnpm test && pnpm test:e2e`.
+  - Run `pnpm check`.
   (R2, R27)
 
 ## Tests
@@ -197,9 +207,9 @@ Tile    │ [-15%] (icon on tint, pack label at foot)                           
 | R4 | `e2e/quality.spec.ts`: axe `color-contrast` (part of `wcag2aa`) passes on every page |
 | R5 | `src/data/catalog.test.ts`: exactly 3 categories and 12 subcategories with the spec's names; every product's category and subcategory exist |
 | R6 | `src/data/catalog.test.ts`: 24 products, unique ids and slugs, at least one pack each, every price is an integer above 0 |
-| R7 | `src/lib/format.test.ts`: `12000` → `12.000 ₫`, `185000` → `185.000 ₫`; `e2e/quality.spec.ts`: no text on any page matches `\d,\d+\s?₫` or `\.\d{1,2}\s?₫` (decimals in a price; `Chai 1,5 L` is fine) |
-| R8 | `src/lib/format.test.ts`: the three examples from the spec; `ProductTile.test.tsx`: the tile shows the unit price |
-| R9 | `src/lib/format.test.ts`: 115000/135000 → 15; `ProductTile.test.tsx`: `-15%` badge and struck-through old price; `e2e/browse.spec.ts`: the deals page lists exactly the deal products |
+| R7 | `src/lib/store.test.ts`: `12000` → `12.000 ₫`, `185000` → `185.000 ₫`; `e2e/quality.spec.ts`: no text on any page matches `\d,\d+\s?₫` or `\.\d{1,2}\s?₫` (decimals in a price; `Chai 1,5 L` is fine) |
+| R8 | `src/lib/store.test.ts`: the three examples from the spec; `ProductTile.test.tsx`: the tile shows the unit price |
+| R9 | `src/lib/store.test.ts`: 115000/135000 → 15; `ProductTile.test.tsx`: `-15%` badge and struck-through old price; `e2e/browse.spec.ts`: the deals page lists exactly the deal products |
 | R10 | `ProductTile.test.tsx`: low and out labels, and no enabled add control when out; `e2e/browse.spec.ts`: the product page for `Dầu gội` shows `Hết hàng` with the add button disabled |
 | R11 | `ProductImage.test.tsx`: the placeholder has the category tint and an icon; with `image` set it renders an `img` with the product name as `alt` |
 | R12 | `src/lib/search.test.ts`: `nuoc suoi`, `GIAY`, `banh` and name-first ranking; `e2e/browse.spec.ts`: header search and the no-results message with category links |
@@ -222,7 +232,8 @@ Tile    │ [-15%] (icon on tint, pack label at foot)                           
 ## Risks
 
 - **Non-breaking space in prices.** `Intl` puts U+00A0 before `₫`. Unit tests must expect ` ` (or compare against `formatPrice`). Playwright text assertions normalize whitespace, so browser tests can use a normal space. Mixing these up gives confusing failures.
-- **Big switch-over in step 7.** It touches the cart and every route at once. Keep it limited to what's listed (placeholders only) so it stays reviewable, and expect `pnpm test:e2e` to have no tests until step 12.
+- **Big switch-over in step 7.** It touches the cart, `formatPrice` and every route at once. Keep it limited to what's listed (placeholders only) so it stays reviewable. Between steps 7 and 12 the only browser tests are the R1 checks in `quality.spec.ts`.
+- **Lint limits (decision 0002).** Complexity 15, nesting 3, 4 parameters. Today `Shop`'s filter code reaches complexity 13 and a 4-parameter helper, and `ProductDetail` reaches 12. The Category page adds four sorts, subcategories and in-stock, and the product page adds packs and stock. Keep each filter and sort a small function (`sortProducts` maps a sort id to a comparator), and give checkout one small check per field.
 - **Saved data from the coffee store.** Shoppers who visited the coffee demo have `second-crack.cart` and `second-crack.orders` in localStorage. The new keys avoid reading them. The old data is left in place, which is harmless.
 - **Old links.** `/shop` and `/product/...` now show the Vietnamese not-found page. That's acceptable for a demo with no real traffic. Add redirects only if the owner asks.
 - **Accessible names in Vietnamese.** Tests look up controls by Vietnamese text (decision 0004), so wording changes break selectors. Keep button text identical to the spec (`Thêm`, `Thêm vào giỏ`, `Thanh toán`, `Đặt hàng`).

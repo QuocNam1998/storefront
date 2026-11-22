@@ -13,7 +13,7 @@ Every feature that shows, adds up or charges money needs to know how prices are 
 ## Decision
 
 - All money values (pack prices, old prices, delivery fee, thresholds, subtotals, totals, unit prices) are **whole numbers of đồng**, stored as plain `number` integers. Nothing is divided by 100.
-- Money is formatted in one place, `formatPrice` in `src/lib/format.ts`, using `new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })`. That gives `12.000 ₫`, with a non-breaking space (U+00A0) before `₫` so a price never wraps across lines.
+- Money is formatted in one place, `formatPrice` in `src/lib/store.ts` (where the store's other price rules live), using `new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })`. That gives `12.000 ₫`, with a non-breaking space (U+00A0) before `₫` so a price never wraps across lines.
 - Unit prices are calculated from the pack's total amount and rounded to whole đồng with `Math.round` before formatting.
 - Discount percentages are `Math.round((1 - price / wasPrice) * 100)`.
 
