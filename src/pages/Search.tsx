@@ -1,5 +1,6 @@
 import { Link, useSearchParams } from 'react-router-dom'
 import { ProductGrid } from '@/components/ProductGrid'
+import { CategoryIconRow } from '@/components/SiteChrome'
 import { categories } from '@/data/catalog'
 import { searchProducts } from '@/lib/search'
 
@@ -9,7 +10,8 @@ export function Search() {
   const results = searchProducts(query)
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+    <div>
+      <CategoryIconRow />
       <h1 className="text-3xl font-semibold wrap-break-word sm:text-4xl">{query ? `Kết quả cho “${query}”` : 'Tìm kiếm'}</h1>
       <section aria-live="polite" aria-label="Kết quả" className="mt-6">
         {results.length > 0 ? (

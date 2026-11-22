@@ -1,6 +1,12 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 
 const results = (page: Page) => page.getByRole('region', { name: 'Kết quả' })
+
+async function box(locator: Locator) {
+  const b = await locator.boundingBox()
+  if (!b) throw new Error(`${locator} is not visible`)
+  return b
+}
 async function listedNames(page: Page): Promise<string[]> {
   const names = results(page).getByRole('heading', { level: 3 })
   // Reading every heading doesn't wait for the page, so wait for the first tile before reading.
@@ -47,22 +53,55 @@ test('in-stock only hides products that are sold out', async ({ page }) => {
   expect(await listedNames(page)).not.toContain('Dầu gội')
 })
 
-test('the home page shows delivery, the categories, deals, then a row per category', async ({ page }) => {
+test('the home page shows the delivery banner, then every product in one grid', async ({ page, isMobile }) => {
   await page.goto('/')
   const main = page.getByRole('main')
   await expect(main.getByRole('heading', { level: 1 })).toHaveText('Giao hàng trong 2 giờ')
   await expect(main).toContainText('Miễn phí giao hàng cho đơn từ 300.000 ₫')
 
-  const sections = await main.locator('section').evaluateAll((els) => els.map((el) => el.getAttribute('aria-label')))
-  expect(sections).toEqual(['Danh mục sản phẩm', 'Ưu đãi tuần này', 'Đồ ăn vặt', 'Nước uống', 'Nhu yếu phẩm'])
-  // The product rows scroll sideways; the page itself must not.
+  const all = main.getByRole('region', { name: 'Tất cả sản phẩm' })
+  await expect(all).toContainText('24 sản phẩm')
+  const names = all.getByRole('heading', { level: 3 })
+  await expect(names).toHaveCount(24)
+  await expect(names.first()).toHaveText('Khoai tây chiên vị tảo biển')
+  await expect(names.last()).toHaveText('Nước mắm')
+  const columns = await all.getByRole('article').evaluateAll((tiles) => {
+    const tops = tiles.map((t) => t.getBoundingClientRect().top)
+    return tops.filter((top) => top === tops[0]).length
+  })
+  expect(columns).toBe(isMobile ? 2 : 3)
   expect(await page.locator('html').evaluate((html) => html.scrollWidth <= html.clientWidth)).toBe(true)
 
-  await main.getByRole('region', { name: 'Danh mục sản phẩm' }).getByRole('link', { name: /Nhu yếu phẩm/ }).click()
-  await expect(page).toHaveURL(/\/c\/nhu-yeu-pham$/)
-  await page.goBack()
-  await main.getByRole('link', { name: 'Xem tất cả Nước uống' }).click()
-  await expect(page).toHaveURL(/\/c\/nuoc-uong$/)
+  await main.getByRole('link', { name: 'Xem ưu đãi' }).click()
+  await expect(page).toHaveURL(/\/deals$/)
+})
+
+test('below desktop width the categories show as a row of icon tiles instead of the sidebar', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'The icon row replaces the sidebar on phones')
+  await page.goto('/')
+  const row = page.getByRole('navigation', { name: 'Danh mục' })
+  await expect(row.getByRole('link')).toHaveText(['Đồ ăn vặt', 'Nước uống', 'Nhu yếu phẩm', 'Ưu đãi'])
+  await row.getByRole('link', { name: 'Ưu đãi' }).click()
+  await expect(page).toHaveURL(/\/deals$/)
+  await expect(row.getByRole('link', { name: 'Ưu đãi' })).toHaveAttribute('aria-current', 'page')
+})
+
+test('the shop layout has the sidebar and cart panel from 1280 px, and the icon row below that', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'Sets its own window sizes')
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await page.goto('/')
+  const nav = page.getByRole('navigation', { name: 'Danh mục' })
+  const panel = page.getByRole('complementary', { name: 'Giỏ hàng' })
+  await expect(panel).toBeVisible()
+  await expect(nav.getByRole('link').first()).toHaveText(/^Tất cả/)
+
+  await page.setViewportSize({ width: 1024, height: 800 })
+  await expect(panel).toBeHidden()
+  await expect(nav.getByRole('link')).toHaveText(['Đồ ăn vặt', 'Nước uống', 'Nhu yếu phẩm', 'Ưu đãi'])
+  await page.getByRole('button', { name: 'Thêm Bánh quy bơ vào giỏ' }).click()
+  await expect(page.getByRole('link', { name: /^Xem giỏ hàng, \d+ món/ })).toBeHidden()
+  await page.getByRole('button', { name: 'Mở giỏ hàng, 1 món' }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
 })
 
 test('the deals page lists exactly the products with a pack on a deal', async ({ page }) => {
@@ -106,10 +145,95 @@ test('a chosen pack and quantity go into the cart from the product page', async 
   await expect(drawer.getByRole('group')).toHaveText('2')
 })
 
-test('similar products start with the same subcategory', async ({ page }) => {
+test('similar products are the first four, starting with the same subcategory', async ({ page }) => {
   await page.goto('/p/nuoc-suoi-tinh-khiet')
-  const similar = page.getByRole('region', { name: 'Sản phẩm tương tự' }).getByRole('heading', { level: 3 })
+  const similar = page.getByRole('region', { name: 'Có thể bạn cũng thích' }).getByRole('heading', { level: 3 })
+  await expect(similar).toHaveCount(4)
   await expect(similar.first()).toHaveText('Nước khoáng thiên nhiên')
+})
+
+test('the desktop product page shows its parts in order', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'The phone layout is checked on its own')
+  await page.goto('/p/nuoc-suoi-tinh-khiet')
+  const crumbs = page.getByRole('navigation', { name: 'Đường dẫn' })
+  await expect(crumbs.getByRole('link')).toHaveText(['Trang chủ', 'Nước uống'])
+  await expect(crumbs).toContainText('Nước suối tinh khiết')
+
+  const main = page.getByRole('main')
+  await expect(main).toContainText(/5\.000\s₫\s*\/\s*Chai 500 ml/)
+  await expect(main).toContainText('10.000 ₫/L')
+  const parts = [
+    main.getByRole('link', { name: 'Nước uống', exact: true }).last(),
+    main.getByRole('heading', { level: 1 }),
+    main.getByRole('heading', { name: 'Chọn loại' }),
+    main.getByRole('button', { name: /^Thêm vào giỏ ·/ }),
+    main.getByText('Thanh toán khi nhận hàng (COD)'),
+    main.getByRole('heading', { name: 'Mô tả sản phẩm' }),
+    main.getByRole('heading', { name: 'Có thể bạn cũng thích' }),
+  ]
+  const tops = []
+  for (const part of parts) tops.push((await box(part)).y)
+  expect(tops).toEqual([...tops].sort((a, b) => a - b))
+  await expect(main.getByRole('button', { name: 'Mua ngay' })).toBeVisible()
+})
+
+test('the add button shows the total for the chosen pack and quantity, and packs can be chosen by keyboard', async ({ page }) => {
+  await page.goto('/p/nuoc-suoi-tinh-khiet')
+  await page.getByRole('radio', { name: /Thùng 24 chai/ }).click()
+  await page.getByRole('button', { name: 'Tăng số lượng' }).click()
+  await expect(page.getByRole('button', { name: /^Thêm vào giỏ ·/ })).toHaveText('Thêm vào giỏ · 198.000 ₫')
+
+  await page.getByRole('radio', { name: /Chai 500 ml/ }).click()
+  await page.keyboard.press('ArrowRight')
+  await expect(page.getByRole('radio', { name: /Lốc 6 chai/ })).toBeFocused()
+  await page.keyboard.press('Space')
+  await expect(page.getByRole('radio', { name: /Lốc 6 chai/ })).toBeChecked()
+})
+
+test('on a phone the product page has no header, puts back and cart buttons on the photo and fixes the add bar to the bottom', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'The phone layout of the product page')
+  await page.goto('/')
+  await page.getByRole('link', { name: 'Bánh quy bơ' }).click()
+  await expect(page).toHaveURL(/\/p\/banh-quy-bo$/)
+  await expect(page.getByRole('banner')).toHaveCount(0)
+  await expect(page.getByRole('searchbox')).toHaveCount(0)
+
+  const bar = page.locator('[data-bottom-bar]')
+  await expect(bar.getByRole('button', { name: /^Thêm vào giỏ ·/ })).toBeVisible()
+  const windowHeight = await page.evaluate(() => window.innerHeight)
+  const barBox = await box(bar)
+  expect(barBox.y + barBox.height).toBe(windowHeight)
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+  const footer = await box(page.getByRole('contentinfo'))
+  expect(footer.y + footer.height).toBeLessThanOrEqual((await box(bar)).y)
+
+  await page.getByRole('button', { name: 'Mở giỏ hàng, 0 món' }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await page.keyboard.press('Escape')
+  await page.getByRole('button', { name: 'Quay lại' }).click()
+  await expect(page).toHaveURL(/\/$/)
+
+  await page.goto('/p/banh-quy-bo')
+  await page.getByRole('button', { name: 'Quay lại' }).click()
+  await expect(page).toHaveURL(/\/$/)
+})
+
+test('from 768 px the product page has the site header and no photo buttons', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'Sets its own window size')
+  await page.setViewportSize({ width: 768, height: 900 })
+  await page.goto('/p/banh-quy-bo')
+  await expect(page.getByRole('banner')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Quay lại' })).toHaveCount(0)
+  await page.getByRole('banner').getByRole('button', { name: /^Mở giỏ hàng/ }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+})
+
+test('every product page lists the delivery promise, the free-delivery rule and cash on delivery', async ({ page }) => {
+  await page.goto('/p/banh-quy-bo')
+  const main = page.getByRole('main')
+  for (const text of ['Giao hàng trong 2 giờ', 'Miễn phí giao hàng cho đơn từ 300.000 ₫', 'Thanh toán khi nhận hàng (COD)']) {
+    await expect(main.getByText(text, { exact: true })).toBeVisible()
+  }
 })
 
 test('a low-stock product page says so and still lets the product be added', async ({ page }) => {
@@ -122,6 +246,95 @@ test('an out-of-stock product says so and cannot be added', async ({ page }) => 
   await page.goto('/p/dau-goi')
   await expect(page.getByRole('main')).toContainText('Hết hàng')
   await expect(page.getByRole('button', { name: 'Thêm vào giỏ' })).toBeDisabled()
+  await expect(page.getByRole('button', { name: 'Mua ngay' })).toBeDisabled()
+})
+
+test('the header has the logo, the search field and the cart button, and no category row', async ({ page, isMobile }) => {
+  await page.goto('/c/do-an-vat')
+  const header = page.getByRole('banner')
+  await expect(header.getByRole('navigation')).toHaveCount(0)
+  const footer = page.getByRole('contentinfo')
+  for (const name of ['Đồ ăn vặt', 'Nước uống', 'Nhu yếu phẩm']) await expect(footer.getByRole('link', { name })).toBeVisible()
+
+  const tile = page.getByRole('article').filter({ hasText: 'Bánh quy bơ' })
+  await tile.getByRole('button', { name: /^Thêm/ }).click()
+  for (let i = 0; i < 3; i++) await tile.getByRole('button', { name: 'Tăng số lượng' }).click()
+  const cart = header.getByRole('button', { name: 'Mở giỏ hàng, 4 món' })
+  await expect(cart.getByText('4', { exact: true })).toBeVisible()
+  if (isMobile) await expect(cart.getByText('Giỏ hàng')).toBeHidden()
+  else await expect(cart.getByText('Giỏ hàng')).toBeVisible()
+
+  const logo = header.getByRole('link', { name: 'Cửa hàng của Thy' })
+  const search = header.getByRole('searchbox', { name: 'Tìm sản phẩm' })
+  const [logoBox, searchBox] = [await box(logo), await box(search)]
+  // On a phone the search field gets its own row under the logo; on desktop they share one.
+  if (isMobile) expect(searchBox.y).toBeGreaterThan(logoBox.y + logoBox.height)
+  else expect(searchBox.y).toBeLessThan(logoBox.y + logoBox.height)
+
+  await cart.click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await page.keyboard.press('Escape')
+  await logo.click()
+  await expect(page).toHaveURL(/\/$/)
+})
+
+test('tile buttons in one grid row line up, and read Thêm vào giỏ on desktop and Thêm on a phone', async ({ page, isMobile }) => {
+  await page.goto('/c/do-an-vat')
+  const buttons = page.getByRole('article').getByRole('button', { name: /^Thêm/ })
+  // The first row mixes a two-line name with a one-line one.
+  const lastInRow = isMobile ? 1 : 2
+  expect((await box(buttons.nth(lastInRow))).y).toBe((await box(buttons.nth(0))).y)
+  await expect(buttons.first()).toHaveText(isMobile ? 'Thêm' : 'Thêm vào giỏ', { useInnerText: true })
+})
+
+test('the desktop sidebar lists every category with its count and marks the current one', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'The sidebar is for desktop widths')
+  await page.goto('/c/do-an-vat')
+  const sidebar = page.getByRole('navigation', { name: 'Danh mục' })
+  await expect(sidebar.getByRole('link')).toHaveText([/^Tất cả\s*24$/, /^Đồ ăn vặt\s*8$/, /^Nước uống\s*8$/, /^Nhu yếu phẩm\s*8$/, /^Ưu đãi\s*3$/])
+  await expect(sidebar.getByRole('link', { name: /Đồ ăn vặt/ })).toHaveAttribute('aria-current', 'page')
+  await sidebar.getByRole('link', { name: /Nước uống/ }).click()
+  await expect(page).toHaveURL(/\/c\/nuoc-uong$/)
+})
+
+test('the desktop cart panel shows the cart, updates with the tiles and stays in view', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'The cart panel is for desktop widths')
+  await page.goto('/c/do-an-vat')
+  const panel = page.getByRole('complementary', { name: 'Giỏ hàng' })
+  await expect(panel).toContainText('Giỏ hàng đang trống.')
+  await expect(panel.getByRole('link', { name: /Thanh toán/ })).toHaveCount(0)
+
+  const tile = page.getByRole('article').filter({ hasText: 'Bánh quy bơ' })
+  await tile.getByRole('button', { name: /^Thêm/ }).click()
+  await expect(panel).toContainText('Bánh quy bơ')
+  await expect(panel).toContainText(/Phí giao hàng\s*20\.000\s₫/)
+  await expect(panel).toContainText(/Tổng cộng\s*109\.000\s₫/)
+  await panel.getByRole('button', { name: 'Tăng số lượng' }).click()
+  await expect(tile.getByRole('group')).toHaveText('2 trong giỏ')
+
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+  await expect(panel).toBeInViewport()
+  await panel.getByRole('link', { name: /Thanh toán/ }).click()
+  await expect(page).toHaveURL(/\/checkout$/)
+})
+
+test('the phone cart bar shows once the cart has items, never covers the footer, and opens the cart', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'The cart bar is for phones')
+  await page.goto('/c/do-an-vat')
+  // The footer has its own plain "Xem giỏ hàng" link; the bar's name also carries the count and subtotal.
+  const bar = page.getByRole('link', { name: /^Xem giỏ hàng, \d+ món/ })
+  await expect(bar).toHaveCount(0)
+
+  await page.getByRole('article').filter({ hasText: 'Bánh quy bơ' }).getByRole('button', { name: /^Thêm/ }).click()
+  await expect(bar).toHaveAccessibleName('Xem giỏ hàng, 1 món, 89.000 ₫')
+  await expect(bar).toContainText('Giỏ hàng')
+
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+  const [footer, barBox] = [await box(page.getByRole('contentinfo')), await box(bar)]
+  expect(footer.y + footer.height).toBeLessThanOrEqual(barBox.y)
+
+  await bar.click()
+  await expect(page).toHaveURL(/\/cart$/)
 })
 
 test('a tile turns Thêm into a quantity control and back', async ({ page }) => {
@@ -129,11 +342,11 @@ test('a tile turns Thêm into a quantity control and back', async ({ page }) => 
   const tile = page.getByRole('article').filter({ hasText: 'Bánh quy bơ' })
   await tile.getByRole('button', { name: /^Thêm/ }).click()
   await expect(page.getByRole('button', { name: 'Mở giỏ hàng, 1 món' })).toBeAttached()
-  await expect(tile.getByRole('group')).toHaveText('1')
+  await expect(tile.getByRole('group')).toHaveText('1 trong giỏ')
 
   await tile.getByRole('button', { name: 'Tăng số lượng' }).click()
   await tile.getByRole('button', { name: 'Tăng số lượng' }).click()
-  await expect(tile.getByRole('group')).toHaveText('3')
+  await expect(tile.getByRole('group')).toHaveText('3 trong giỏ')
 
   for (let i = 0; i < 3; i++) await tile.getByRole('button', { name: 'Giảm số lượng' }).click()
   await expect(tile.getByRole('button', { name: /^Thêm/ })).toBeVisible()

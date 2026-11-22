@@ -44,6 +44,12 @@ describe('ProductTile', () => {
     expect(container.querySelector('s')).toBeNull()
   })
 
+  it('labels the add button with the product, and reads Thêm vào giỏ', () => {
+    renderTile('banh-quy-bo')
+    const add = screen.getByRole('button', { name: 'Thêm Bánh quy bơ vào giỏ' })
+    expect(add.textContent).toBe('Thêm vào giỏ')
+  })
+
   it('says when a product is low on stock and still lets it be added', () => {
     renderTile('nuoc-dua-dong-hop')
     expect(screen.getByText('Sắp hết hàng')).toBeTruthy()
@@ -61,12 +67,12 @@ describe('ProductTile', () => {
     fireEvent.click(screen.getByRole('button', { name: /^Thêm/ }))
     expect(count()).toBe('1')
     const stepper = screen.getByRole('group', { name: 'Số lượng Bánh quy bơ' })
-    expect(stepper.textContent).toBe('1')
+    expect(stepper.textContent).toBe('1 trong giỏ')
     expect(stepper.contains(document.activeElement)).toBe(true)
 
     fireEvent.click(screen.getByRole('button', { name: 'Tăng số lượng' }))
     fireEvent.click(screen.getByRole('button', { name: 'Tăng số lượng' }))
-    expect(stepper.textContent).toBe('3')
+    expect(stepper.textContent).toBe('3 trong giỏ')
 
     for (let i = 0; i < 3; i++) fireEvent.click(screen.getByRole('button', { name: 'Giảm số lượng' }))
     expect(count()).toBe('0')
