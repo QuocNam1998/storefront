@@ -56,6 +56,13 @@ for (const path of PAGES) {
       await expect(page.getByRole('contentinfo')).toContainText('Cửa hàng của Thy')
     })
 
+    test('tints the browser bar with the cream page color and keeps its description', async ({ page }) => {
+      const mist = await page.locator('html').evaluate((html) => getComputedStyle(html).getPropertyValue('--mist').trim().toUpperCase())
+      expect(mist).toMatch(/^#[0-9A-F]{6}$/)
+      expect((await page.locator('meta[name="theme-color"]').getAttribute('content'))?.toUpperCase()).toBe(mist)
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', 'Đồ ăn vặt, nước uống và nhu yếu phẩm. Giao hàng trong 2 giờ.')
+    })
+
     test('has no coffee words, dollars, roast dates or decimal prices', async ({ page }) => {
       const text = await page.locator('body').innerText()
       // "rang" alone is fine: Hạt điều rang muối means salted roasted cashews.
@@ -105,6 +112,25 @@ test('the background, action and accent colors differ, and the accent marks only
   })
   expect(new Set([colors.background, colors.action, colors.deal]).size).toBe(3)
   expect(colors.misplaced).toEqual([])
+})
+
+test('the favicon is the store basket drawn only in the cream page color and the green action color', async ({ page }) => {
+  await page.goto('/')
+  const icon = page.locator('link[rel="icon"]')
+  await expect(icon).toHaveAttribute('href', '/favicon.svg')
+  await expect(icon).toHaveAttribute('type', 'image/svg+xml')
+  const tokens = await page.locator('html').evaluate((html) => {
+    const style = getComputedStyle(html)
+    return [style.getPropertyValue('--mist'), style.getPropertyValue('--sea')].map((v) => v.trim().toUpperCase())
+  })
+
+  const response = await page.request.get('/favicon.svg')
+  expect(response.headers()['content-type']).toContain('image/svg+xml')
+  const svg = await response.text()
+  const colors = [...new Set(svg.toUpperCase().match(/#[0-9A-F]{3}(?:[0-9A-F]{3})?\b/g))]
+  expect(colors.sort()).toEqual(tokens.sort())
+  expect(svg.match(/<rect\b/g)).toHaveLength(1)
+  expect(svg.match(/<path\b/g)).toHaveLength(3)
 })
 
 test.describe('with reduced motion', () => {
