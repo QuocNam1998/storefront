@@ -15,7 +15,6 @@ Don't write code for a feature that has no approved spec and plan.
 - To change a feature that's `done`, write a new feature whose spec names the archived requirements it changes (e.g. "create-a-todo-list R4"). Never edit anything in `_archive/`.
 - Requirement numbers (R1, R2, …) are permanent, because plans and tests refer to them. Never reuse or renumber them: add new ones after the last, and cross out a dropped one (`~~R7~~ removed: <why>`) instead of deleting it.
 - Code goes in `src/`, tests in `src/**/*.test.ts(x)` beside the file under test (Vitest), browser tests in `e2e/*.spec.ts` (Playwright). Run tests with `pnpm test && pnpm test:e2e`. Every requirement in a spec should have at least one test.
-- _TBD: Vitest and Playwright aren't installed yet, so the `test` and `test:e2e` scripts don't exist. Setting them up is the first feature._
 
 ## Workflow commands
 

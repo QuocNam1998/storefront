@@ -37,13 +37,15 @@ The site makes no network requests for data.
 - Tailwind CSS v4, shadcn/ui on Radix, lucide-react icons, the Archivo variable font from Fontsource
 - Browser localStorage is the only storage
 - oxlint for linting, pnpm for packages
+- Vitest with jsdom and Testing Library for unit and component tests, Playwright (Chromium, desktop and Pixel 7 sizes) for browser tests
+- GitHub Actions CI (`.github/workflows/ci.yml`): lint, build, unit tests and browser tests on every push and pull request
 - Claude Code MCP servers in `.mcp.json`: shadcn (components) and playwright (driving the browser)
 
 ## Conventions
 
 - **Layout:** code in `src/`, organised as `pages/` (one per route), `components/` (site components) with `components/ui/` (shadcn), `store/` (React context), `lib/` (plain logic) and `data/` (catalog). Unit and component tests go beside the file they test as `*.test.ts(x)`, and browser tests go in `e2e/*.spec.ts`.
 - **Running:** `pnpm install`, then `pnpm dev` (http://localhost:5173). `pnpm build` type-checks and builds to `dist/`, `pnpm preview` serves that build, and `pnpm lint` runs oxlint.
-- **Testing:** Vitest for unit and component tests, Playwright for browser flows. Run everything with `pnpm test && pnpm test:e2e`. _TBD: neither tool is installed yet and both scripts are missing from `package.json`. Setting them up is the first feature._
+- **Testing:** Vitest for unit and component tests, Playwright for browser flows. Run everything with `pnpm test && pnpm test:e2e`. Before the first browser test run on a new machine, install Chromium once with `pnpm exec playwright install chromium`.
 
 ## Known concerns
 

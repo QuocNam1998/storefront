@@ -16,6 +16,9 @@ pnpm install
 pnpm dev        # http://localhost:5173
 pnpm build      # type-check and production build
 pnpm lint
+pnpm test       # unit and component tests (Vitest)
+pnpm exec playwright install chromium   # once, before the first browser test run
+pnpm test:e2e   # browser tests (Playwright, starts the dev server itself)
 ```
 
 ## What's in it
@@ -58,4 +61,3 @@ Tokens are in `src/index.css`.
 
 - Swap localStorage orders for a backend, and add payments (for example Stripe Checkout).
 - Load products from a CMS or a commerce API.
-- Add tests (Playwright for the checkout flow, Vitest for cart logic).

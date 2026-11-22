@@ -36,8 +36,9 @@ The starter tests describe today's behavior and change no app code. The Monday r
 - [x] 2. Add `src/test/setup.ts` and write `src/store/cart.test.tsx`. Include one pair of tests where the first writes localStorage and the second finds it empty. Covers R3, R10.
 - [x] 3. Install `@playwright/test` and Chromium. Add the `test:e2e` script, `playwright.config.ts`, the `tsconfig.node.json` include and the `.gitignore` entries. Write `e2e/checkout.spec.ts`. Run `pnpm test:e2e` with nothing on port 5173, then again with `pnpm dev` already running. Check that both screen sizes are listed, that no server is left running, and that a deliberately failing step exits non-zero (then undo it). Covers R4, R5, R6, R11.
 - [x] 4. Check that the test files don't break the build. Run `pnpm build` and `pnpm lint`. Confirm that a deliberate type error in a test file fails `pnpm build` (then undo it), that `dist/` contains no test code, and that `git status` is unchanged after both test commands. Covers R6, R7.
-- [ ] 5. Add `.github/workflows/ci.yml`. Before pushing anything, ask David whether a branch can be pushed to check the workflow. A green run checks R12. A throwaway commit with a failing browser test checks that the run fails and the report can be downloaded, and it's then dropped. Covers R12, R13.
-- [ ] 6. Update the README, remove the `_TBD_` line from `CLAUDE.md`, and update Tech stack and Conventions → Testing in `docs/architecture.md`. Covers R14.
+- [x] 5. Add `.github/workflows/ci.yml`. Before pushing anything, ask David whether a branch can be pushed to check the workflow. A green run checks R12. A throwaway commit with a failing browser test checks that the run fails and the report can be downloaded, and it's then dropped. Covers R12, R13.
+  - Done 2026-11-22: David pushed `feature/test-setup` and checked it himself. Run 44983208787 on `ce08d8d` passed with every step run. No red run was made, so R12's failing half and R13 are still untested.
+- [x] 6. Update the README, remove the `_TBD_` line from `CLAUDE.md`, and update Tech stack and Conventions → Testing in `docs/architecture.md`. Covers R14.
 
 ## Tests
 
