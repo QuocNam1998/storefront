@@ -16,6 +16,15 @@ Don't write code for a feature that has no approved spec and plan.
 - Requirement numbers (R1, R2, …) are permanent, because plans and tests refer to them. Never reuse or renumber them: add new ones after the last, and cross out a dropped one (`~~R7~~ removed: <why>`) instead of deleting it.
 - Code goes in `src/`, tests in `src/**/*.test.ts(x)` beside the file under test (Vitest), browser tests in `e2e/*.spec.ts` (Playwright). Run tests with `pnpm test && pnpm test:e2e`. Every requirement in a spec should have at least one test.
 
+## Coding rules
+
+See [decision 0002](docs/decisions/0002-kiss-and-dry-guardrails.md).
+
+- **KISS:** write the simplest code that meets the requirement. No abstraction, generic type, config object or option that only one caller uses or that exists "for later". Use plain functions and existing components first. Don't add a dependency for something a few lines can do.
+- **DRY:** search before writing. Each thing has one source of truth: store rules (prices, shipping, roast dates) in `src/lib/store.ts`, products in `src/data/`, look and feel in `src/index.css`. Pull logic into a shared helper when it shows up a second time. Markup that only looks similar doesn't count.
+- **When KISS and DRY conflict, KISS wins.** Two small repeated lines beat the wrong abstraction.
+- **Don't silence lint rules** with disable comments. `pnpm lint` limits function complexity, nesting and parameter count, and lints each TypeScript file Claude edits. When code doesn't fit, simplify it.
+
 ## Workflow commands
 
 | Command | Use |

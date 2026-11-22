@@ -46,6 +46,7 @@ The site makes no network requests for data.
 - **Layout:** code in `src/`, organised as `pages/` (one per route), `components/` (site components) with `components/ui/` (shadcn), `store/` (React context), `lib/` (plain logic) and `data/` (catalog). Unit and component tests go beside the file they test as `*.test.ts(x)`, and browser tests go in `e2e/*.spec.ts`.
 - **Running:** `pnpm install`, then `pnpm dev` (http://localhost:5173). `pnpm build` type-checks and builds to `dist/`, `pnpm preview` serves that build, and `pnpm lint` runs oxlint.
 - **Testing:** Vitest for unit and component tests, Playwright for browser flows. Run everything with `pnpm test && pnpm test:e2e`. Before the first browser test run on a new machine, install Chromium once with `pnpm exec playwright install chromium`.
+- **Guardrails** ([decision 0002](decisions/0002-kiss-and-dry-guardrails.md)): `pnpm lint` enforces the limits set in `.oxlintrc.json` on function complexity, nesting depth and parameter count, and fails on a needless `else`, lone `if` or trailing `return`. In Claude Code, a hook in `.claude/settings.json` lints each `.ts`/`.tsx` file Claude writes or edits and shows it the errors straight away. The hook's script and its test live in `.claude/hooks/`, and `pnpm test` runs that test too. UI work follows the `storefront-ui` skill in `.claude/skills/`: theme tokens, reuse before writing, and a visual check at desktop and phone sizes.
 
 ## Known concerns
 
