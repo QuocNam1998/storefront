@@ -3,6 +3,12 @@
 A demo ecommerce site for a small roastery, built with React 19, TypeScript, Vite, Tailwind CSS v4 and shadcn/ui.
 No backend: products are in `src/data/products.ts`, and the cart and orders are saved in the browser's localStorage.
 
+![Home page](screenshots/home-desktop.png)
+
+| Product page | Shop on mobile |
+| --- | --- |
+| ![Product page](screenshots/product-desktop.png) | ![Shop on mobile](screenshots/shop-mobile.png) |
+
 ## Run it
 
 ```bash
