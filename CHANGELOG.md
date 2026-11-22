@@ -5,6 +5,32 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0] - 2026-11-22
+
+### Changed
+
+- The storefront is now **Cửa hàng của Thy**, a Vietnamese neighborhood grocery selling snacks, water and drinks, and everyday essentials, in place of the Second Crack coffee store. The whole interface is in Vietnamese and every price is in whole đồng.
+- New calm look: a pale blue-green page, one sea-green action color, apricot only for deals, the Be Vietnam Pro typeface, no drop shadows and no load animations.
+- Cart lines are one product in one pack, up to 99 each, and the cart is saved under a new key, so a coffee cart is never read.
+- Checkout asks for a phone number and a two-level Vietnamese address (no district or postal code), with an optional note for the driver. Delivery is 20.000 ₫, free from 300.000 ₫, within 2 hours. Cash on delivery is the only payment method.
+- Orders get `THY-` ids.
+
+### Added
+
+- 24 products in 3 categories and 12 subcategories, each with one or more packs and a stock level.
+- Unit prices (per 100 g, per litre or per item) on tiles and product pages, and deals with a discount badge and the old price struck through.
+- Header search that ignores accents and case, with a results page.
+- Category pages with a subcategory filter, four sorts and an in-stock-only option, all kept in the address.
+- Deals page, and a home page with the delivery promise, category tiles, a deals row and a row per category.
+- Add to cart straight from a product tile, which turns into a quantity control.
+- Free-delivery progress bar in the cart drawer and on the cart page.
+- Product images fall back to a placeholder in the category's color with the subcategory's icon until a photo is added.
+- Browser checks for every page: Vietnamese text and store name, no coffee words or dollars, an axe accessibility scan, no sideways scrolling at 390 and 1366 px, a keyboard-only order with a visible focus ring, and no motion under reduced motion.
+
+### Removed
+
+- The coffee catalog, brewing gear, roast dates, grind choice, the roast scale and the US shipping methods.
+
 ## [0.0.2] - 2026-11-22
 
 ### Added

@@ -1,18 +1,30 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/archivo/wdth.css";
+@import "@fontsource/be-vietnam-pro/400.css";
+@import "@fontsource/be-vietnam-pro/500.css";
+@import "@fontsource/be-vietnam-pro/600.css";
+@import "@fontsource/be-vietnam-pro/700.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
     --font-heading: var(--font-sans);
-    --font-sans: 'Archivo Variable', ui-sans-serif, system-ui, sans-serif;
-    --color-bean: var(--bean);
-    --color-parchment: var(--parchment);
-    --color-roast: var(--roast);
-    --color-cherry: var(--cherry);
-    --color-cherry-deep: var(--cherry-deep);
+    --font-sans: 'Be Vietnam Pro', ui-sans-serif, system-ui, sans-serif;
+    --color-mist: var(--mist);
+    --color-surface: var(--surface);
+    --color-ink: var(--ink);
+    --color-ink-soft: var(--ink-soft);
+    --color-sea: var(--sea);
+    --color-sea-deep: var(--sea-deep);
+    --color-apricot: var(--apricot);
+    --color-line: var(--line);
+    --color-tint-snacks: var(--tint-snacks);
+    --color-tint-drinks: var(--tint-drinks);
+    --color-tint-essentials: var(--tint-essentials);
+    --color-icon-snacks: var(--icon-snacks);
+    --color-icon-drinks: var(--icon-drinks);
+    --color-icon-essentials: var(--icon-essentials);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -54,45 +66,56 @@
 }
 
 :root {
-    /* Second Crack palette, named for the coffee supply chain */
-    --bean: #d6ddcb;        /* unroasted green coffee: page */
-    --parchment: #f3f5ee;   /* the husk around the bean: raised surfaces */
-    --roast: #3a2418;       /* dark roast: ink */
-    --cherry: #b3202a;      /* coffee cherry: actions */
-    --cherry-deep: #8f1820;
+    /* Cửa hàng của Thy: calm water greens, one action color, one warm color for deals */
+    --mist: #EEF3F1;        /* page background */
+    --surface: #FAFCFB;     /* tiles, drawer, form fields, summary panels */
+    --ink: #1F3A3D;         /* text */
+    --ink-soft: #4F676A;    /* secondary text */
+    --sea: #2F7A6B;         /* the one action color */
+    --sea-deep: #235E52;    /* button hover, error text */
+    --apricot: #F2B880;     /* deals only */
+    --line: #D3DEDA;        /* dividers, input borders */
 
-    --background: var(--bean);
-    --foreground: var(--roast);
-    --card: var(--parchment);
-    --card-foreground: var(--roast);
-    --popover: var(--parchment);
-    --popover-foreground: var(--roast);
-    --primary: var(--cherry);
-    --primary-foreground: #ffffff;
-    --secondary: #c7d0ba;
-    --secondary-foreground: var(--roast);
-    --muted: #c7d0ba;
-    --muted-foreground: #5e4a3e;
-    --accent: #c7d0ba;
-    --accent-foreground: var(--roast);
-    --destructive: var(--cherry);
-    --border: #a9b59b;
-    --input: #8f9d80;
-    --ring: var(--roast);
+    /* Category colors: tile and placeholder background, and the icon on it */
+    --tint-snacks: #F7E3CF;
+    --tint-drinks: #D7EDF0;
+    --tint-essentials: #E4E2F0;
+    --icon-snacks: #9A5B2A;
+    --icon-drinks: #2C6E7A;
+    --icon-essentials: #5A5480;
+
+    --background: var(--mist);
+    --foreground: var(--ink);
+    --card: var(--surface);
+    --card-foreground: var(--ink);
+    --popover: var(--surface);
+    --popover-foreground: var(--ink);
+    --primary: var(--sea);
+    --primary-foreground: var(--surface);
+    --secondary: var(--mist);
+    --secondary-foreground: var(--ink);
+    --muted: var(--mist);
+    --muted-foreground: var(--ink-soft);
+    --accent: var(--mist);
+    --accent-foreground: var(--ink);
+    --destructive: var(--sea-deep);
+    --border: var(--line);
+    --input: var(--line);
+    --ring: var(--sea);
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
     --chart-3: oklch(0.439 0 0);
     --chart-4: oklch(0.371 0 0);
     --chart-5: oklch(0.269 0 0);
-    --radius: 0.375rem;
-    --sidebar: var(--parchment);
-    --sidebar-foreground: var(--roast);
-    --sidebar-primary: var(--cherry);
-    --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: #c7d0ba;
-    --sidebar-accent-foreground: var(--roast);
-    --sidebar-border: #a9b59b;
-    --sidebar-ring: var(--roast);
+    --radius: 0.75rem;
+    --sidebar: var(--surface);
+    --sidebar-foreground: var(--ink);
+    --sidebar-primary: var(--sea);
+    --sidebar-primary-foreground: var(--surface);
+    --sidebar-accent: var(--mist);
+    --sidebar-accent-foreground: var(--ink);
+    --sidebar-border: var(--line);
+    --sidebar-ring: var(--sea);
 }
 
 .dark {
@@ -141,30 +164,18 @@
     }
   html {
     @apply font-sans;
-    font-stretch: 100%;
     -webkit-font-smoothing: antialiased;
     }
   :focus-visible {
-    outline: 2px solid var(--roast);
+    outline: 2px solid var(--sea);
     outline-offset: 2px;
     }
 }
 
-@utility font-wide {
-  font-stretch: 125%;
-}
-@utility font-condensed {
-  font-stretch: 72%;
-}
-
-/* The one orchestrated moment: bags rise onto the shelf on first load. */
-@keyframes shelf-rise {
-  from { transform: translateY(24px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-.shelf-rise {
-  animation: shelf-rise 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
-}
+/* Shoppers who turn off motion get none, including the cart drawer's slide. */
 @media (prefers-reduced-motion: reduce) {
-  .shelf-rise { animation: none; }
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }

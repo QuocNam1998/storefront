@@ -1,7 +1,16 @@
 import { Link, useParams } from 'react-router-dom'
+import { OrderTotals } from '@/components/OrderTotals'
 import { Button } from '@/components/ui/button'
 import { getOrder } from '@/lib/orders'
-import { SHIPPING_METHODS, formatDay, formatPrice } from '@/lib/store'
+import { DELIVERY_PROMISE, formatPrice } from '@/lib/store'
+
+function ContinueShopping() {
+  return (
+    <Button asChild size="xl" className="mt-8">
+      <Link to="/">Tiếp tục mua sắm</Link>
+    </Button>
+  )
+}
 
 export function OrderConfirmation() {
   const { id = '' } = useParams()
@@ -9,66 +18,53 @@ export function OrderConfirmation() {
 
   if (!order) {
     return (
-      <div className="mx-auto max-w-6xl px-4 pt-16 sm:px-6">
-        <h1 className="font-wide text-4xl font-black tracking-tight">We couldn’t find order {id}.</h1>
-        <p className="mt-4 max-w-md text-lg">Orders are saved in the browser they were placed in. Try opening this link there.</p>
-        <Button asChild size="xl" className="mt-8">
-          <Link to="/shop">Go to the shop</Link>
-        </Button>
+      <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+        <h1 className="text-3xl font-semibold sm:text-4xl">Không tìm thấy đơn hàng</h1>
+        <p className="mt-4 max-w-md text-lg">
+          Đơn hàng {id} không có trong trình duyệt này. Đơn hàng chỉ được lưu trên trình duyệt đã dùng để đặt.
+        </p>
+        <ContinueShopping />
       </div>
     )
   }
 
-  const roast = new Date(order.roastDate)
-  const ships = new Date(roast)
-  ships.setDate(ships.getDate() + 2)
-  const firstName = order.shipTo.name.split(' ')[0]
-  const method = SHIPPING_METHODS.find((m) => m.id === order.shippingMethod)
-
   return (
-    <div className="mx-auto max-w-3xl px-4 pt-12 sm:px-6">
-      <p className="text-muted-foreground">Order {order.id}</p>
-      <h1 className="font-wide mt-2 text-4xl leading-none font-black tracking-tight sm:text-5xl">Thanks, {firstName}. Your order is in.</h1>
-      <p className="mt-6 max-w-prose text-lg leading-relaxed">
-        Your coffee goes into the roast on <strong className="font-semibold">{formatDay(roast)}</strong> and ships by{' '}
-        <strong className="font-semibold">{formatDay(ships)}</strong>. In a real store, a confirmation would go to {order.email}.
+    <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+      <h1 className="text-3xl font-semibold sm:text-4xl">Cảm ơn {order.name}!</h1>
+      <p className="mt-2 text-lg">
+        Mã đơn hàng <span className="font-semibold">{order.id}</span>. {DELIVERY_PROMISE}.
       </p>
 
-      <div className="mt-10 grid gap-8 rounded-md bg-parchment p-6 sm:grid-cols-2">
-        <div>
-          <h2 className="font-semibold">Shipping to</h2>
-          <address className="mt-2 leading-relaxed not-italic">
-            {order.shipTo.name}<br />
-            {order.shipTo.address}<br />
-            {order.shipTo.city}, {order.shipTo.region} {order.shipTo.postalCode}<br />
-            {order.shipTo.country}
-          </address>
-          <p className="mt-3 text-sm text-muted-foreground">{method?.label} shipping, {method?.detail}</p>
-        </div>
-        <div>
-          <h2 className="font-semibold">Items</h2>
-          <ul className="mt-2 space-y-2">
+      <div className="mt-8 grid items-start gap-8 md:grid-cols-[1fr_22rem]">
+        <section aria-label="Giao đến" className="space-y-1 rounded-lg bg-surface p-5">
+          <h2 className="mb-2 font-semibold">Giao đến</h2>
+          <p>{order.name}</p>
+          <p className="tabular-nums">{order.phone}</p>
+          <p>{[order.street, order.ward, order.province].join(', ')}</p>
+          {order.note && <p className="text-ink-soft">Ghi chú: {order.note}</p>}
+          <p className="pt-3 text-ink-soft">Thanh toán khi nhận hàng (COD)</p>
+        </section>
+
+        <section aria-label="Đơn hàng" className="rounded-lg bg-surface p-5">
+          <h2 className="font-semibold">Đơn hàng</h2>
+          <ul className="mt-4 space-y-3">
             {order.lines.map((l) => (
-              <li key={`${l.slug}-${l.detail}`} className="flex justify-between gap-4 text-sm">
+              <li key={`${l.slug}|${l.packLabel}`} className="flex justify-between gap-4 text-sm">
                 <span>
-                  {l.qty} × <Link to={`/product/${l.slug}`} className="underline underline-offset-2">{l.name}</Link>
-                  {l.detail && <span className="block text-muted-foreground">{l.detail}</span>}
+                  <span className="font-medium">
+                    {l.qty} × {l.name}
+                  </span>
+                  <span className="block text-ink-soft">{l.packLabel}</span>
                 </span>
                 <span className="tabular-nums">{formatPrice(l.lineTotal)}</span>
               </li>
             ))}
           </ul>
-          <dl className="mt-4 space-y-1 border-t border-border pt-3 text-sm">
-            <div className="flex justify-between"><dt>Subtotal</dt><dd className="tabular-nums">{formatPrice(order.subtotal)}</dd></div>
-            <div className="flex justify-between"><dt>Shipping</dt><dd className="tabular-nums">{order.shipping === 0 ? 'Free' : formatPrice(order.shipping)}</dd></div>
-            <div className="flex justify-between text-base font-bold"><dt>Total</dt><dd className="tabular-nums">{formatPrice(order.total)}</dd></div>
-          </dl>
-        </div>
+          <OrderTotals subtotal={order.subtotal} delivery={order.delivery} />
+        </section>
       </div>
 
-      <Button asChild size="xl" className="mt-10">
-        <Link to="/shop">Keep shopping</Link>
-      </Button>
+      <ContinueShopping />
     </div>
   )
 }
