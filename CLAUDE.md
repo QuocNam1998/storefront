@@ -25,6 +25,15 @@ See [decision 0002](docs/decisions/0002-kiss-and-dry-guardrails.md).
 - **When KISS and DRY conflict, KISS wins.** Two small repeated lines beat the wrong abstraction.
 - **Don't silence lint rules** with disable comments. `pnpm lint` limits function complexity, nesting and parameter count, and lints each TypeScript file Claude edits. When code doesn't fit, simplify it.
 
+## UI reference
+
+- Design source: `/design/*.dc.html` plus a screenshot of each (`Main`, `Product`, `Cart` on mobile; `Desktop`, `DesktopProduct` from 1024 px). Reference only: never import them or copy their runtime. See `design/README.md`.
+- Target brand from the design: green `#1E5B3A`, accent `#F2C14E`, background `#F7F5EE`, text `#1C1C18`. These reach the code only as tokens in `src/index.css`, through the `design-refresh` feature. Until that feature lands, `src/index.css` is the source of truth; never put a hex value in a component.
+- Font: Be Vietnam Pro, weights 400/500/600/700 (already loaded from Fontsource).
+- All UI copy is Vietnamese (decision 0004). Every price goes through `formatPrice` in `src/lib/store.ts`; don't format money anywhere else.
+- Touch targets at least 44 × 44 px. Use real `<button>`, `<a>`/`<Link>` and `<label>`, never a clickable `<div>`.
+- The mockups take shortcuts: every card opens the same product and each screen has its own cart. The app keeps its real `/p/:slug` route and its one shared `CartProvider`.
+
 ## Workflow commands
 
 | Command | Use |
