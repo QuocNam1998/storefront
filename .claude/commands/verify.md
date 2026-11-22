@@ -6,7 +6,7 @@ argument-hint: <feature-name>
 Verify feature **$ARGUMENTS** against its spec.
 
 1. Read `docs/features/$ARGUMENTS/spec.md` and `docs/features/$ARGUMENTS/plan.md`.
-2. Run the full test suite and the linter (`pnpm test && pnpm test:e2e && pnpm lint`) and report the actual output.
+2. Run `pnpm check` (the tests, browser tests, linter and type-checking build) and report the actual output.
 3. For each requirement (R1, R2, …) and acceptance criterion, report:
    - **pass / fail / untested**
    - the code and test that cover it (`path:line`)

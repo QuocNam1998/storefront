@@ -30,10 +30,10 @@ Change a variant or a prop before you copy a component. Two components that diff
 
 ## Visual check
 
-Do this after every UI change, and after the browser tests have run, because `pnpm test:e2e` clears `test-results/`.
+Do this after every UI change.
 
 1. Start the app with `pnpm dev` (http://localhost:5173), unless it's already running.
-2. With the Playwright MCP tools, open each page you changed at both sizes defined in `playwright.config.ts`: the Desktop Chrome viewport and the Pixel 7 viewport. Take a full-page screenshot of each and save it under `test-results/visual-check/<feature>/`.
+2. With the Playwright MCP tools, open each page you changed at both sizes defined in `playwright.config.ts`: the Desktop Chrome viewport and the Pixel 7 viewport. Take a full-page screenshot of each and save it under `.playwright-mcp/visual-check/<feature>/`. Git ignores that folder and the browser tests don't clear it, so the screenshots last until `/verify`.
 3. Read the browser console. There must be no errors or warnings caused by the change.
 4. Use the keyboard alone to reach and use every new control. Focus must stay visible.
 5. Go through the shadcn audit checklist (the shadcn MCP's audit tool) for any component you added.

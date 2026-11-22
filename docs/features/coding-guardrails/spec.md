@@ -55,10 +55,10 @@ The developer needs the repo itself to push every Claude session (local, cloud o
 - **R8.** `/plan` requires the **Approach** to name the existing code the feature reuses, and each new file, abstraction or dependency listed under **Files** to give a one-line reason it's needed.
 - **R9.** `/implement`, for each step:
   - looks for existing code to reuse in `src/lib/`, `src/components/` (including `ui/`) and `src/data/` before writing new code
-  - runs `pnpm lint` as well as the tests
+  - runs `pnpm lint` and `pnpm build` as well as the tests, so a type error anywhere, including in a test file, is caught at that step
   - after a step that changes the UI, does the visual check from R11
 - **R10.** `/verify`:
-  - runs `pnpm lint` and reports its actual output alongside the test output
+  - runs `pnpm lint` and `pnpm build`, and reports their actual output alongside the test output
   - adds a **KISS / DRY review** to its report, listing repeated logic, abstractions or options with only one user, and exports nothing imports. It lists "none found" when that's the case.
   - for each UI requirement, links the screenshots from the visual check as evidence
 
@@ -73,6 +73,11 @@ The developer needs the repo itself to push every Claude session (local, cloud o
 **Docs**
 
 - **R13.** The Conventions section of `docs/architecture.md` mentions the lint limits, lint on edit and the `storefront-ui` skill. Everything else in the file is still true.
+
+**Visual check files** (found by the trial run of the workflow on 2026-11-22)
+
+- **R14.** Doing the visual check leaves `git status` unchanged: nothing it or the browser tool writes shows up as a new file.
+- **R15.** Screenshots from the visual check are still there after a later `pnpm test:e2e` run, so `/verify` can link them at the end of a feature.
 
 ## Acceptance criteria
 
@@ -93,11 +98,13 @@ The developer needs the repo itself to push every Claude session (local, cloud o
 - **R6:** Given a fresh clone with dependencies installed, on macOS or Linux, when Claude edits a `.ts` file with a lint error, then the error is shown, with no extra setup.
 - **R7:** Given `/spec` for a feature that adds a new page and the request mentions only its content, then Claude asks about its states, its phone layout and its keyboard behaviour before writing the spec.
 - **R8:** Given `/plan` for a feature whose plan adds a new file, then **Approach** names the existing code being reused and **Files** gives a reason for the new file.
-- **R9:** Given `/implement` on a plan with a UI step, then for that step Claude reports what existing code it checked, the `pnpm lint` result alongside the test results, and the desktop and phone screenshots.
-- **R10:** Given `/verify` on a finished feature, then the report includes the `pnpm lint` output, a KISS / DRY review section (or "none found"), and screenshots for each UI requirement.
+- **R9:** Given `/implement` on a plan with a UI step, then for that step Claude reports what existing code it checked, the `pnpm lint` and `pnpm build` results alongside the test results, and the desktop and phone screenshots. Given a step that leaves a type error in a test file, then that step's checks fail.
+- **R10:** Given `/verify` on a finished feature, then the report includes the `pnpm lint` and `pnpm build` output, a KISS / DRY review section (or "none found"), and screenshots for each UI requirement.
 - **R11:** Given a request to add a UI element, then the `storefront-ui` skill is offered, and following it means using theme tokens, reusing components in the stated order, and doing the visual check.
 - **R12:** Given the feature is done, when I read the `storefront-ui` skill, then it says when to use it and when to use `frontend-design`.
 - **R13:** Given the feature is done, then the Conventions section of `docs/architecture.md` mentions the lint limits, lint on edit and the `storefront-ui` skill.
+- **R14:** Given a clean working tree, when the visual check is done on a page, then `git status` still shows no changes.
+- **R15:** Given visual-check screenshots of a page, when `pnpm test:e2e` runs afterwards, then the screenshots are still there.
 
 ## Open questions
 

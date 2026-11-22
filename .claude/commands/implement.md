@@ -11,7 +11,7 @@ Implement feature **$ARGUMENTS**.
 4. Work through the plan's unchecked steps in order. For each step:
    - before writing new code, look for code to reuse in `src/lib/`, `src/components/` (including `ui/`) and `src/data/`, and say what you checked
    - change only what that step needs (code in `src/`, tests in `src/**/*.test.ts(x)` beside the file under test, browser tests in `e2e/*.spec.ts`)
-   - run the tests and the linter (`pnpm test && pnpm test:e2e && pnpm lint`)
+   - run `pnpm check`: the tests, browser tests, linter and type-checking build
    - if the step changes the UI, do the visual check from the `storefront-ui` skill and report the screenshot paths
    - for a bug's regression-test step, the new test must fail. If it passes, it doesn't reproduce the bug: stop and tell me
    - tick the step in `plan.md`

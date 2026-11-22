@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "check": "pnpm test && pnpm test:e2e && pnpm lint && pnpm build"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",
