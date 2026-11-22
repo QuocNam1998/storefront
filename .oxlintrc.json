@@ -3,6 +3,12 @@
   "plugins": ["react", "typescript", "oxc"],
   "rules": {
     "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+    "react/only-export-components": ["warn", { "allowConstantExport": true }],
+    "eslint/complexity": ["error", 15],
+    "eslint/max-depth": ["error", 3],
+    "eslint/max-params": ["error", 4],
+    "eslint/no-else-return": "error",
+    "eslint/no-lonely-if": "error",
+    "eslint/no-useless-return": "error"
   }
 }

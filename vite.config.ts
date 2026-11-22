@@ -11,7 +11,7 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
-    include: ['src/**/*.test.{ts,tsx}'],
+    include: ['src/**/*.test.{ts,tsx}', '.claude/hooks/*.test.mjs'],
     setupFiles: ['src/test/setup.ts'],
   },
 })

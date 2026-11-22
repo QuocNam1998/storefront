@@ -18,6 +18,9 @@ playwright-report/
 blob-report/
 playwright/.cache/
 
+# Browser tool output from Claude Code, including visual-check screenshots
+.playwright-mcp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
