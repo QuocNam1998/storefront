@@ -17,6 +17,18 @@ async function chooseProvince(page: Page, name: string) {
 
 const placeOrder = (page: Page) => page.getByRole('button', { name: 'Đặt hàng' }).click()
 
+test('Mua ngay puts the chosen pack and quantity in the cart and goes straight to checkout', async ({ page }) => {
+  await page.goto('/p/nuoc-suoi-tinh-khiet')
+  await page.getByRole('radio', { name: /Lốc 6 chai/ }).click()
+  for (let i = 0; i < 2; i++) await page.getByRole('button', { name: 'Tăng số lượng' }).click()
+  await page.getByRole('button', { name: 'Mua ngay' }).click()
+  await expect(page).toHaveURL(/\/checkout$/)
+  const summary = page.getByRole('complementary', { name: 'Tóm tắt đơn hàng' })
+  await expect(summary.getByRole('listitem')).toHaveCount(1)
+  await expect(summary.getByRole('listitem')).toContainText('3 × Nước suối tinh khiết')
+  await expect(summary.getByRole('listitem')).toContainText('Lốc 6 chai')
+})
+
 test('a shopper orders one product from a tile and one from its product page', async ({ page }) => {
   await page.goto('/c/do-an-vat')
   await page.getByRole('article').filter({ hasText: 'Bánh quy bơ' }).getByRole('button', { name: /^Thêm/ }).click()

@@ -76,7 +76,7 @@ export function Checkout() {
 
   if (lines.length === 0) {
     return (
-      <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6">
         <h1 className="text-3xl font-semibold sm:text-4xl">Thanh toán</h1>
         <p className="mt-6 text-lg">Giỏ hàng đang trống, nên chưa có gì để thanh toán.</p>
         <Button asChild size="xl" className="mt-4">
@@ -113,7 +113,7 @@ export function Checkout() {
   const errorCount = Object.keys(errors).length
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+    <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6">
       <h1 className="text-3xl font-semibold sm:text-4xl">Thanh toán</h1>
 
       <div className="mt-8 grid gap-10 md:grid-cols-[1fr_22rem]">
@@ -167,12 +167,12 @@ export function Checkout() {
 
           <fieldset>
             <legend className="mb-4 text-xl font-semibold">Giao hàng</legend>
-            <p className="rounded-lg bg-surface p-4 font-medium">{DELIVERY_PROMISE} sau khi đặt hàng.</p>
+            <p className="rounded-2xl border border-line bg-surface p-4 font-medium">{DELIVERY_PROMISE} sau khi đặt hàng.</p>
           </fieldset>
 
           <fieldset>
             <legend className="mb-4 text-xl font-semibold">Thanh toán</legend>
-            <div className="space-y-2 rounded-lg bg-surface p-4">
+            <div className="space-y-2 rounded-2xl border border-line bg-surface p-4">
               <p className="font-medium">Thanh toán khi nhận hàng (COD)</p>
               <p className="text-sm text-ink-soft">
                 Đây là cửa hàng demo: không có thanh toán thật, và đơn hàng chỉ được lưu trong trình duyệt này.
@@ -185,7 +185,7 @@ export function Checkout() {
           </Button>
         </form>
 
-        <aside className="self-start rounded-lg bg-surface p-6 md:sticky md:top-32" aria-label="Tóm tắt đơn hàng">
+        <aside className="self-start rounded-2xl border border-line bg-surface p-6 md:sticky md:top-32" aria-label="Tóm tắt đơn hàng">
           <h2 className="font-semibold">Tóm tắt đơn hàng</h2>
           <ul className="mt-4 space-y-3">
             {lines.map((l) => (

@@ -8,3 +8,6 @@ Status: `spec` → `planned` → `in-progress` → `done` (once done, the folder
 | coding-guardrails | done | david | [features/_archive/coding-guardrails/](_archive/coding-guardrails/) |
 | grocery-store | done | _TBD_ | [features/_archive/grocery-store/](_archive/grocery-store/) |
 | design-refresh | spec | _TBD_ | [features/design-refresh/](design-refresh/) |
+| ui-redesign | done | david | [features/_archive/ui-redesign/](_archive/ui-redesign/) |
+| product-details | spec | david | [features/product-details/](product-details/) |
+| 5-old-theme-color | done | david | [features/_archive/5-old-theme-color/](_archive/5-old-theme-color/) |
