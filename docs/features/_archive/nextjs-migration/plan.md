@@ -1,6 +1,6 @@
 # nextjs-migration: plan
 
-Spec: [spec.md](spec.md). Decisions: [0007](../../decisions/0007-nextjs-app-router-on-vercel.md), feature [0001](decisions/0001-unknown-category-not-found-drawn-in-browser.md).
+Spec: [spec.md](spec.md). Decisions: [0007](../../../decisions/0007-nextjs-app-router-on-vercel.md), feature [0001](decisions/0001-unknown-category-not-found-drawn-in-browser.md).
 
 ## Approach
 

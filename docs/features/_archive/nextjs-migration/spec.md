@@ -26,7 +26,7 @@ Doing the move on its own, before any backend work, keeps it safe: the whole sto
 
 ## Changes to archived requirements
 
-None. Every requirement in [grocery-store](../_archive/grocery-store/spec.md) and [ui-redesign](../_archive/ui-redesign/spec.md) still holds as written (R2 here).
+None. Every requirement in [grocery-store](../grocery-store/spec.md) and [ui-redesign](../ui-redesign/spec.md) still holds as written (R2 here).
 
 ## Requirements
 
@@ -65,7 +65,7 @@ None. Every requirement in [grocery-store](../_archive/grocery-store/spec.md) an
 
   CI runs them on every push and pull request, and they pass.
 - **R10.** The existing unit tests and browser tests still pass, with none of their checks removed or loosened. Only their setup may change, for example how the server starts or how a test renders a component.
-- **R11.** The coding guardrails ([decision 0002](../../decisions/0002-kiss-and-dry-guardrails.md)) cover every TypeScript file, including any new folders. `pnpm lint` enforces them, and Claude Code's lint-on-edit check still reports errors as files are edited.
+- **R11.** The coding guardrails ([decision 0002](../../../decisions/0002-kiss-and-dry-guardrails.md)) cover every TypeScript file, including any new folders. `pnpm lint` enforces them, and Claude Code's lint-on-edit check still reports errors as files are edited.
 - **R12.** The store can be deployed to Vercel, on the owner's own account, with no server of its own to run, and a deployment serves every page in R1.
 
 ### Added after review
