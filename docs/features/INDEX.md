@@ -11,3 +11,4 @@ Status: `spec` → `planned` → `in-progress` → `done` (once done, the folder
 | product-details | spec | david | [features/product-details/](product-details/) |
 | 5-old-theme-color | done | david | [features/_archive/5-old-theme-color/](_archive/5-old-theme-color/) |
 | nextjs-migration | done | david | [features/_archive/nextjs-migration/](_archive/nextjs-migration/) |
+| 9-search-text-lost-on-load | done | david | [features/_archive/9-search-text-lost-on-load/](_archive/9-search-text-lost-on-load/) |

@@ -125,6 +125,22 @@ test('the header search ignores accents and case', async ({ page }) => {
   expect(await listedNames(page)).toEqual(expect.arrayContaining(['Bánh quy bơ', 'Bánh gạo nướng vị ngọt']))
 })
 
+test('the header search box shows the address search, and the earlier one after Back', async ({ page }) => {
+  const search = page.getByRole('searchbox', { name: 'Tìm sản phẩm' })
+  await page.goto('/search?q=banh')
+  await expect(search).toHaveValue('banh')
+  await page.goto('/')
+  await expect(search).toHaveValue('')
+
+  await page.goto('/search?q=nuoc')
+  await search.fill('banh')
+  await search.press('Enter')
+  await expect(page).toHaveURL(/\/search\?q=banh$/)
+  await page.goBack()
+  await expect(page).toHaveURL(/\/search\?q=nuoc$/)
+  await expect(search).toHaveValue('nuoc')
+})
+
 test('a search with no results says so and links to the three categories', async ({ page }) => {
   await page.goto('/search?q=xyz123')
   await expect(results(page)).toContainText('Không tìm thấy sản phẩm nào cho "xyz123"')

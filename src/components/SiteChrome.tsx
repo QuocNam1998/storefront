@@ -27,6 +27,7 @@ export const NAV_LINKS = [
 
 function SearchForm({ current }: { current: string }) {
   const router = useRouter()
+  const { loaded } = useCart()
   const [value, setValue] = useState(current)
   const [shown, setShown] = useState(current)
 
@@ -48,14 +49,17 @@ function SearchForm({ current }: { current: string }) {
         Tìm sản phẩm
       </label>
       <Search aria-hidden="true" className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-ink-soft" />
+      {/* The box can't be used until the page has started up. Anything typed earlier would be wiped when the page
+          starts up, and Enter would reload the page instead of searching. It looks the same while it waits. */}
       <Input
         id="site-search"
         name="q"
         type="search"
         value={value}
         onChange={(e) => setValue(e.target.value)}
+        disabled={!loaded}
         placeholder="Tìm đồ ăn vặt, nước uống, nhu yếu phẩm…"
-        className="h-11 rounded-xl bg-mist pl-10"
+        className="h-11 rounded-xl bg-mist pl-10 disabled:bg-mist disabled:opacity-100"
       />
     </form>
   )

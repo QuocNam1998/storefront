@@ -133,3 +133,86 @@ test('no page logs an error or warning with a saved cart and order', async ({ pa
   await seed(page)
   expect(await consoleProblems(page)).toEqual([])
 })
+
+test.describe('before the page has started up', () => {
+  // Hold the page's scripts back, so there's a reliable moment to act before the page starts up.
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/_next/static/chunks/**/*.js', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+      await route.continue()
+    })
+  })
+
+  const search = (page: Page) => page.getByRole('searchbox', { name: 'Tìm sản phẩm' })
+  const cartButton = (page: Page) => page.getByRole('banner').getByRole('button', { name: /^Mở giỏ hàng/ })
+
+  /** Fails if the page has started up already: until then the cart button has no count. */
+  async function notStartedYet(page: Page) {
+    expect(await cartButton(page).getAttribute('aria-label')).toBe('Mở giỏ hàng')
+  }
+
+  async function openEarly(page: Page, path: string) {
+    await page.goto(path, { waitUntil: 'domcontentloaded' })
+    await notStartedYet(page)
+  }
+
+  /** Clicks the box and types, as a shopper would. A box that can't be used yet ignores both. */
+  async function typeEarly(page: Page) {
+    await search(page).click({ force: true })
+    await page.keyboard.type('nuoc suoi')
+  }
+
+  async function lookOfBox(page: Page) {
+    return search(page).evaluate((el) => {
+      const s = getComputedStyle(el)
+      return { background: s.backgroundColor, opacity: s.opacity, placeholder: el.getAttribute('placeholder') }
+    })
+  }
+
+  test('the search box takes no focus or text until the page has started up, then works', async ({ page }) => {
+    for (const [path, address] of [['/', ''], ['/cart', ''], ['/search?q=banh', 'banh']]) {
+      await openEarly(page, path)
+      await typeEarly(page)
+      // Read once, without waiting, while the page still hasn't started up.
+      const early = await search(page).evaluate((el: HTMLInputElement) => ({ focused: el === document.activeElement, value: el.value }))
+      await notStartedYet(page)
+      expect(early.focused, path).toBe(false)
+      // On the results page the box may still be the empty stand-in, or already show the address's search.
+      expect(['', address], path).toContain(early.value)
+
+      await expect(cartButton(page)).toHaveAccessibleName('Mở giỏ hàng, 0 món')
+      await expect(search(page), path).toHaveValue(address)
+      await search(page).fill('nuoc suoi')
+      await expect(search(page), path).toHaveValue('nuoc suoi')
+    }
+  })
+
+  test('Enter in the search box before the page has started up leaves the page as it is', async ({ page }) => {
+    await openEarly(page, '/')
+    await typeEarly(page)
+    await page.keyboard.press('Enter')
+    await expect(cartButton(page)).toHaveAccessibleName('Mở giỏ hàng, 0 món')
+    await expect(page).toHaveURL(/\/$/)
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Giao hàng trong 2 giờ')
+  })
+
+  test('the search box looks the same before and after the page has started up', async ({ page }) => {
+    await openEarly(page, '/')
+    const before = await lookOfBox(page)
+    await notStartedYet(page)
+    await expect(cartButton(page)).toHaveAccessibleName('Mở giỏ hàng, 0 món')
+    expect(await lookOfBox(page)).toEqual(before)
+  })
+
+  test('trying the search box before the page has started up logs no error or warning', async ({ page }) => {
+    const problems: string[] = []
+    page.on('console', (m) => {
+      if (['error', 'warning'].includes(m.type())) problems.push(`${m.type()}: ${m.text().slice(0, 200)}`)
+    })
+    await openEarly(page, '/')
+    await typeEarly(page)
+    await expect(cartButton(page)).toHaveAccessibleName('Mở giỏ hàng, 0 món')
+    await page.waitForLoadState('networkidle')
+    expect(problems).toEqual([])
+  })
+})
