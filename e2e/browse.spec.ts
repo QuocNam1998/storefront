@@ -37,9 +37,12 @@ test('sorting by price lists each product no cheaper than the one before', async
   await page.getByRole('combobox', { name: 'Sắp xếp' }).click()
   await page.getByRole('option', { name: 'Giá thấp đến cao', exact: true }).click()
   await expect(page).toHaveURL(/[?&]sort=price-asc/)
-  const prices = await listedPrices(page)
-  expect(prices).toHaveLength(8)
-  expect(prices).toEqual([...prices].sort((a, b) => a - b))
+  // The list re-sorts a moment after the address changes, so check again until it has.
+  await expect(async () => {
+    const prices = await listedPrices(page)
+    expect(prices).toHaveLength(8)
+    expect(prices).toEqual([...prices].sort((a, b) => a - b))
+  }).toPass()
 })
 
 test('in-stock only hides products that are sold out', async ({ page }) => {
@@ -120,6 +123,22 @@ test('the header search ignores accents and case', async ({ page }) => {
 
   await page.goto('/search?q=banh')
   expect(await listedNames(page)).toEqual(expect.arrayContaining(['Bánh quy bơ', 'Bánh gạo nướng vị ngọt']))
+})
+
+test('the header search box shows the address search, and the earlier one after Back', async ({ page }) => {
+  const search = page.getByRole('searchbox', { name: 'Tìm sản phẩm' })
+  await page.goto('/search?q=banh')
+  await expect(search).toHaveValue('banh')
+  await page.goto('/')
+  await expect(search).toHaveValue('')
+
+  await page.goto('/search?q=nuoc')
+  await search.fill('banh')
+  await search.press('Enter')
+  await expect(page).toHaveURL(/\/search\?q=banh$/)
+  await page.goBack()
+  await expect(page).toHaveURL(/\/search\?q=nuoc$/)
+  await expect(search).toHaveValue('nuoc')
 })
 
 test('a search with no results says so and links to the three categories', async ({ page }) => {

@@ -5,6 +5,26 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-11-23
+
+### Changed
+
+- The store runs on Next.js 16 instead of Vite and React Router, and deploys to Vercel. Every address and page looks and works as before.
+- Catalog pages arrive from the server with their content already in the page: home, categories (already filtered and sorted as the address says), deals, search, product pages and the not found page.
+- The not found page answers with a 404 status, for an unknown address, category or product.
+- The saved cart and orders are read once the page has loaded, so the cart count and contents appear a moment after the page. They keep the same saved names, so a cart or order saved before this release is still there.
+- On a phone, the not found page for an unknown product now shows the site header, like every other not found page.
+- Browser tests run against the built store instead of the development server.
+
+### Added
+
+- `pnpm start` serves the built store.
+- Browser tests for server rendering, status codes, page details, console errors, and moving between pages without a reload.
+
+### Removed
+
+- `pnpm preview`, replaced by `pnpm start`.
+
 ## [0.2.0] - 2026-11-22
 
 ### Changed

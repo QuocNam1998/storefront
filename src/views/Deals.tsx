@@ -1,3 +1,5 @@
+'use client'
+
 import { ProductGrid } from '@/components/ProductGrid'
 import { CategoryIconRow } from '@/components/SiteChrome'
 import { dealProducts } from '@/data/catalog'

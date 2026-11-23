@@ -1,6 +1,6 @@
 import { Plus } from 'lucide-react'
 import { useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { DealBadge, OldPrice } from '@/components/DealMarks'
 import { ProductImage } from '@/components/ProductImage'
 import { QuantityStepper } from '@/components/QuantityStepper'
@@ -30,7 +30,7 @@ export function ProductTile({ product }: { product: Product }) {
   return (
     // Keeps the hidden "old price" label inside the tile, or a sideways row of tiles makes the whole page scroll on phones.
     <article className="relative flex flex-col rounded-2xl border border-line bg-surface p-3">
-      <Link to={`/p/${product.slug}`} className="group block rounded-md">
+      <Link href={`/p/${product.slug}`} className="group block rounded-md">
         <div className="relative">
           <ProductImage product={product} />
           <DealBadge pack={pack} />

@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom'
+'use client'
+
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { CartLineRow } from '@/components/CartLineRow'
@@ -22,7 +24,7 @@ export function CartSheet() {
           <div className="flex flex-1 flex-col items-start gap-4 p-6">
             <p className="text-lg">Giỏ hàng đang trống.</p>
             <Button asChild size="xl">
-              <Link to="/" onClick={close}>
+              <Link href="/" onClick={close}>
                 Tiếp tục mua sắm
               </Link>
             </Button>
@@ -41,12 +43,12 @@ export function CartSheet() {
               </div>
               <FreeDeliveryProgress subtotal={subtotal} />
               <Button asChild size="xl">
-                <Link to="/checkout" onClick={close}>
+                <Link href="/checkout" onClick={close}>
                   Thanh toán
                 </Link>
               </Button>
               <Button asChild variant="ghost">
-                <Link to="/cart" onClick={close}>
+                <Link href="/cart" onClick={close}>
                   Xem giỏ hàng
                 </Link>
               </Button>

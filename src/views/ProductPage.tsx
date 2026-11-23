@@ -1,6 +1,9 @@
+'use client'
+
 import { ArrowLeft, ShoppingCart, Truck, Wallet } from 'lucide-react'
-import { useState } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
 import { DealBadge, OldPrice } from '@/components/DealMarks'
 import { ProductImage } from '@/components/ProductImage'
 import { ProductTile } from '@/components/ProductTile'
@@ -11,7 +14,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { categories, getProductBySlug, similarProducts, STOCK_TEXT, type Pack, type Product } from '@/data/catalog'
 import { DELIVERY_PROMISE, FREE_DELIVERY_RULE, formatPrice, formatUnitPrice } from '@/lib/store'
 import { cn } from '@/lib/utils'
-import { NotFound } from '@/pages/NotFound'
+import { NotFound } from '@/views/NotFound'
 import { useCart } from '@/store/cart'
 
 function PackChoice({ product, pack, onChange }: { product: Product; pack: Pack; onChange: (packId: string) => void }) {
@@ -42,20 +45,32 @@ function PackChoice({ product, pack, onChange }: { product: Product; pack: Pack;
   )
 }
 
+// Set once the shopper moves from one store page to another. A product page opened straight from a link has no
+// earlier store page, so Quay lại goes home instead of leaving the store.
+let movedInsideStore = false
+
+/** Notes the first move between store pages. It sits in the root layout, so it sees every page change. */
+export function StoreNavigationTracker() {
+  const pathname = usePathname()
+  const firstPath = useRef(pathname)
+  useEffect(() => {
+    if (pathname !== firstPath.current) movedInsideStore = true
+  }, [pathname])
+  return null
+}
+
 /** On a phone, round back and cart buttons over the top of the photo, in place of the site header. */
 function PhotoButtons() {
-  const { count, setOpen } = useCart()
-  const navigate = useNavigate()
-  const location = useLocation()
+  const { loaded, count, setOpen } = useCart()
+  const router = useRouter()
   const round = 'absolute top-4 grid size-11 place-items-center rounded-full bg-surface text-ink md:hidden'
-  // A page opened straight from a link has no earlier page in this store to go back to.
-  const goBack = () => (location.key === 'default' ? navigate('/') : navigate(-1))
+  const goBack = () => (movedInsideStore ? router.back() : router.push('/'))
   return (
     <>
       <button type="button" onClick={goBack} aria-label="Quay lại" className={cn(round, 'left-4')}>
         <ArrowLeft aria-hidden="true" className="size-5" />
       </button>
-      <button type="button" onClick={() => setOpen(true)} aria-label={`Mở giỏ hàng, ${count} món`} className={cn(round, 'right-4')}>
+      <button type="button" onClick={() => setOpen(true)} aria-label={loaded ? `Mở giỏ hàng, ${count} món` : 'Mở giỏ hàng'} className={cn(round, 'right-4')}>
         <ShoppingCart aria-hidden="true" className="size-5" />
         <span className="absolute -top-1 -right-1">
           <CartCount count={count} />
@@ -85,7 +100,7 @@ function DeliveryCard() {
 
 function ProductDetail({ product }: { product: Product }) {
   const { add, setOpen } = useCart()
-  const navigate = useNavigate()
+  const router = useRouter()
   const [packId, setPackId] = useState(product.packs[0].id)
   const [qty, setQty] = useState(1)
   const pack = product.packs.find((p) => p.id === packId) ?? product.packs[0]
@@ -98,7 +113,7 @@ function ProductDetail({ product }: { product: Product }) {
   }
   const buyNow = () => {
     add({ productId: product.id, packId: pack.id, qty })
-    navigate('/checkout')
+    router.push('/checkout')
   }
 
   return (
@@ -116,7 +131,7 @@ function ProductDetail({ product }: { product: Product }) {
         </div>
         <div className="max-md:relative max-md:-mx-4 max-md:-mt-6 max-md:rounded-t-3xl max-md:bg-surface max-md:px-4 max-md:pt-6 max-md:pb-2">
           {category && (
-            <Link to={`/c/${category.slug}`} className="inline-block rounded-full bg-sea/10 px-3 py-1 text-sm font-semibold text-sea hover:underline">
+            <Link href={`/c/${category.slug}`} className="inline-block rounded-full bg-sea/10 px-3 py-1 text-sm font-semibold text-sea hover:underline">
               {category.name}
             </Link>
           )}
@@ -168,8 +183,7 @@ function ProductDetail({ product }: { product: Product }) {
   )
 }
 
-export function ProductPage() {
-  const { slug = '' } = useParams()
+export function ProductPage({ slug }: { slug: string }) {
   const product = getProductBySlug(slug)
   if (!product) return <NotFound />
   const category = categories.find((c) => c.id === product.categoryId)
@@ -179,7 +193,7 @@ export function ProductPage() {
       <nav aria-label="Đường dẫn" className="mb-6 text-sm max-md:hidden">
         <ol className="flex flex-wrap gap-2">
           <li>
-            <Link to="/" className="text-sea hover:underline">
+            <Link href="/" className="text-sea hover:underline">
               Trang chủ
             </Link>
           </li>
@@ -189,7 +203,7 @@ export function ProductPage() {
           {category && (
             <>
               <li>
-                <Link to={`/c/${category.slug}`} className="text-sea hover:underline">
+                <Link href={`/c/${category.slug}`} className="text-sea hover:underline">
                   {category.name}
                 </Link>
               </li>

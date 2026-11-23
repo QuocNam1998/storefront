@@ -9,6 +9,9 @@ lerna-debug.log*
 
 node_modules
 dist
+.next/
+next-env.d.ts
+*.tsbuildinfo
 dist-ssr
 *.local
 
@@ -31,3 +34,4 @@ playwright/.cache/
 *.njsproj
 *.sln
 *.sw?
+.vercel

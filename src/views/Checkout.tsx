@@ -1,5 +1,8 @@
+'use client'
+
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useRef, useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
 import { OrderTotals } from '@/components/OrderTotals'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -67,8 +70,8 @@ function buildOrder(f: Form, lines: CartLine[], subtotal: number): Order {
 }
 
 export function Checkout() {
-  const { lines, subtotal, clear } = useCart()
-  const navigate = useNavigate()
+  const { loaded, lines, subtotal, clear } = useCart()
+  const router = useRouter()
   const [form, setForm] = useState<Form>(EMPTY)
   const [errors, setErrors] = useState<Errors>({})
   const [submitted, setSubmitted] = useState(false)
@@ -78,10 +81,15 @@ export function Checkout() {
     return (
       <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6">
         <h1 className="text-3xl font-semibold sm:text-4xl">Thanh toán</h1>
-        <p className="mt-6 text-lg">Giỏ hàng đang trống, nên chưa có gì để thanh toán.</p>
-        <Button asChild size="xl" className="mt-4">
-          <Link to="/">Tiếp tục mua sắm</Link>
-        </Button>
+        {/* Until the saved cart is read, the page shows only its heading rather than saying the cart is empty. */}
+        {loaded && (
+          <>
+            <p className="mt-6 text-lg">Giỏ hàng đang trống, nên chưa có gì để thanh toán.</p>
+            <Button asChild size="xl" className="mt-4">
+              <Link href="/">Tiếp tục mua sắm</Link>
+            </Button>
+          </>
+        )}
       </div>
     )
   }
@@ -107,7 +115,7 @@ export function Checkout() {
     const order = buildOrder(form, lines, subtotal)
     saveOrder(order)
     clear()
-    navigate(`/order/${order.id}`, { replace: true })
+    router.replace(`/order/${order.id}`)
   }
 
   const errorCount = Object.keys(errors).length

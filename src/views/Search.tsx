@@ -1,11 +1,14 @@
-import { Link, useSearchParams } from 'react-router-dom'
+'use client'
+
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { ProductGrid } from '@/components/ProductGrid'
 import { CategoryIconRow } from '@/components/SiteChrome'
 import { categories } from '@/data/catalog'
 import { searchProducts } from '@/lib/search'
 
 export function Search() {
-  const [params] = useSearchParams()
+  const params = useSearchParams()
   const query = params.get('q')?.trim() ?? ''
   const results = searchProducts(query)
 
@@ -28,7 +31,7 @@ export function Search() {
             <ul className="mt-2 flex flex-wrap gap-3">
               {categories.map((c) => (
                 <li key={c.id}>
-                  <Link to={`/c/${c.slug}`} className="block rounded-md bg-surface px-4 py-2 font-medium text-sea-deep underline underline-offset-4">
+                  <Link href={`/c/${c.slug}`} className="block rounded-md bg-surface px-4 py-2 font-medium text-sea-deep underline underline-offset-4">
                     {c.name}
                   </Link>
                 </li>

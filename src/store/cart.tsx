@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { getProductById, type Pack, type Product } from '@/data/catalog'
 
@@ -18,6 +20,8 @@ export interface CartLine extends CartItem {
 }
 
 interface CartContextValue {
+  /** False until the saved cart has been read, which happens once the page has loaded in the browser. */
+  loaded: boolean
   lines: CartLine[]
   count: number
   subtotal: number
@@ -57,16 +61,26 @@ function load(): CartItem[] {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(load)
+  const [items, setItems] = useState<CartItem[]>([])
+  const [loaded, setLoaded] = useState(false)
   const [isOpen, setOpen] = useState(false)
 
+  // Read the saved cart only once the page has loaded. The server has no saved cart, so reading it during the
+  // first render would make the page differ from the one the server sent.
   useEffect(() => {
+    setItems(load())
+    setLoaded(true)
+  }, [])
+
+  useEffect(() => {
+    // Saving before the saved cart is read would replace it with an empty one.
+    if (!loaded) return
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
     } catch {
       // Storage can be unavailable (private mode); the cart still works for this visit.
     }
-  }, [items])
+  }, [items, loaded])
 
   const add = useCallback((item: Omit<CartItem, 'key'>) => {
     const key = itemKey(item.productId, item.packId)
@@ -95,6 +109,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return [{ ...i, ...found, lineTotal: found.pack.price * i.qty }]
     })
     return {
+      loaded,
       lines,
       count: lines.reduce((n, l) => n + l.qty, 0),
       subtotal: lines.reduce((n, l) => n + l.lineTotal, 0),
@@ -106,7 +121,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       remove,
       clear,
     }
-  }, [items, isOpen, add, setQty, remove, clear])
+  }, [loaded, items, isOpen, add, setQty, remove, clear])
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }

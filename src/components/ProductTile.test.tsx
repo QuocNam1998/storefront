@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import { ProductTile } from '@/components/ProductTile'
 import { getProductBySlug } from '@/data/catalog'
@@ -11,12 +10,10 @@ function CartCount() {
 
 function renderTile(slug: string) {
   return render(
-    <MemoryRouter>
-      <CartProvider>
-        <ProductTile product={getProductBySlug(slug)!} />
-        <CartCount />
-      </CartProvider>
-    </MemoryRouter>,
+    <CartProvider>
+      <ProductTile product={getProductBySlug(slug)!} />
+      <CartCount />
+    </CartProvider>,
   )
 }
 

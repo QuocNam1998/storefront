@@ -15,7 +15,9 @@ export default defineConfig({
     { name: 'mobile-chromium', use: { ...devices['Pixel 7'] } },
   ],
   webServer: {
-    command: 'pnpm dev --port 5173 --strictPort',
+    // Test the built store, as Vercel serves it. The development server builds pages while the tests open them,
+    // and now and then answers with an error.
+    command: 'pnpm build && pnpm start --port 5173',
     url: 'http://localhost:5173',
     // In CI, always test a server this run started, never one left over from something else.
     reuseExistingServer: !isCI,

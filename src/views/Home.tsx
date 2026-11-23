@@ -1,5 +1,7 @@
+'use client'
+
 import { ShoppingBasket } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { ProductGrid } from '@/components/ProductGrid'
 import { CategoryIconRow } from '@/components/SiteChrome'
 import { Button } from '@/components/ui/button'
@@ -16,7 +18,7 @@ export function Home() {
           </h1>
           <p className="mt-2 sm:text-lg">{FREE_DELIVERY_RULE}.</p>
           <Button asChild size="lg" className="mt-5 h-11 rounded-full bg-apricot px-5 font-semibold text-ink hover:bg-apricot/85">
-            <Link to="/deals">Xem ưu đãi</Link>
+            <Link href="/deals">Xem ưu đãi</Link>
           </Button>
         </div>
         <ShoppingBasket aria-hidden="true" className="hidden size-24 shrink-0 text-apricot md:block" strokeWidth={1.5} />

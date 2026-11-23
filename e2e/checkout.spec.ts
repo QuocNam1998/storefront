@@ -81,7 +81,7 @@ test('checkout promises delivery in 2 hours and has no day or time to choose', a
 test('an empty form lists 5 problems and focuses the name', async ({ page }) => {
   await seedCart(page, [{ productId: 'p08', packId: 'goi-100g', qty: 1 }])
   await placeOrder(page)
-  await expect(page.getByRole('alert')).toHaveText('5 trường cần được sửa trước khi đặt hàng.')
+  await expect(page.getByRole('main').getByRole('alert')).toHaveText('5 trường cần được sửa trước khi đặt hàng.')
   for (const message of [
     'Vui lòng nhập họ và tên.',
     'Vui lòng nhập số điện thoại.',

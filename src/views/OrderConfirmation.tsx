@@ -1,21 +1,27 @@
-import { Link, useParams } from 'react-router-dom'
+'use client'
+
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { OrderTotals } from '@/components/OrderTotals'
 import { Button } from '@/components/ui/button'
-import { getOrder } from '@/lib/orders'
+import { getOrder, type Order } from '@/lib/orders'
 import { DELIVERY_PROMISE, formatPrice } from '@/lib/store'
 
 function ContinueShopping() {
   return (
     <Button asChild size="xl" className="mt-8">
-      <Link to="/">Tiếp tục mua sắm</Link>
+      <Link href="/">Tiếp tục mua sắm</Link>
     </Button>
   )
 }
 
-export function OrderConfirmation() {
-  const { id = '' } = useParams()
-  const order = getOrder(id)
+export function OrderConfirmation({ id }: { id: string }) {
+  // Orders are saved only in the browser, so the page shows nothing until it has looked there, rather than
+  // claiming an order it hasn't read yet doesn't exist.
+  const [order, setOrder] = useState<Order | null>()
+  useEffect(() => setOrder(getOrder(id) ?? null), [id])
 
+  if (order === undefined) return null
   if (!order) {
     return (
       <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6">
