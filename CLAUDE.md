@@ -11,7 +11,7 @@ Don't write code for a feature that has no approved spec and plan.
 - Make a significant technical choice → record it, one file per decision, numbered `NNNN-title.md`, copied from `docs/decisions/0000-template.md`. Where it goes depends on one test: would another feature's plan need to read it?
   - Yes → `docs/decisions/` (project-wide), with a `Raised by` line naming the feature that prompted it.
   - No → `docs/features/<feature>/decisions/` (feature-only, numbered from 0001 within that feature). It is archived with the feature.
-- Once a feature is verified, move its folder to `docs/features/_archive/` and mark it `done` in INDEX.md.
+- Once a feature is verified, mark it `verified` in INDEX.md and leave its folder where it is. Archive it only after its PR's CI passes: then add a last commit to that PR, `chore: archive <feature> feature`, that moves the folder to `docs/features/_archive/` and marks it `done`. David merges the PR into `develop` himself.
 - To change a feature that's `done`, write a new feature whose spec names the archived requirements it changes (e.g. "create-a-todo-list R4"). Never edit anything in `_archive/`.
 - Requirement numbers (R1, R2, …) are permanent, because plans and tests refer to them. Never reuse or renumber them: add new ones after the last, and cross out a dropped one (`~~R7~~ removed: <why>`) instead of deleting it.
 - Code goes in `src/`, tests in `src/**/*.test.ts(x)` beside the file under test (Vitest), browser tests in `e2e/*.spec.ts` (Playwright). Run tests with `pnpm test && pnpm test:e2e`. Every requirement in a spec should have at least one test.

@@ -1,6 +1,6 @@
 # Feature index
 
-Status: `spec` → `planned` → `in-progress` → `done` (once done, the folder moves to `_archive/`)
+Status: `spec` → `planned` → `in-progress` → `verified` → `done` (once its PR's CI passes, the folder moves to `_archive/` and the feature is done)
 
 | Feature | Status | Owner | Folder |
 |---|---|---|---|
