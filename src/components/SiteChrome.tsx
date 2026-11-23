@@ -1,6 +1,9 @@
+'use client'
+
 import { BadgePercent, Search, ShoppingBasket, ShoppingCart } from 'lucide-react'
-import { useState, type FormEvent } from 'react'
-import { Link, NavLink, useMatch, useNavigate, useSearchParams } from 'react-router-dom'
+import Link from 'next/link'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { categories, dealProducts, productsInCategory } from '@/data/catalog'
@@ -22,10 +25,8 @@ export const NAV_LINKS = [
   { to: '/deals', label: 'Ưu đãi', icon: BadgePercent, tint: 'border border-line bg-surface', iconColor: 'text-sea', count: dealProducts.length },
 ]
 
-function SearchForm() {
-  const navigate = useNavigate()
-  const [params] = useSearchParams()
-  const current = params.get('q') ?? ''
+function SearchForm({ current }: { current: string }) {
+  const router = useRouter()
   const [value, setValue] = useState(current)
   const [shown, setShown] = useState(current)
 
@@ -38,7 +39,7 @@ function SearchForm() {
 
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    navigate(`/search?q=${encodeURIComponent(value.trim())}`)
+    router.push(`/search?q=${encodeURIComponent(value.trim())}`)
   }
 
   return (
@@ -60,24 +61,39 @@ function SearchForm() {
   )
 }
 
+function SearchFormFromAddress() {
+  return <SearchForm current={useSearchParams().get('q') ?? ''} />
+}
+
 /** The yellow circle with the number of items in the cart. */
 export function CartCount({ count }: { count: number }) {
-  return <span className="grid size-6 place-items-center rounded-full bg-apricot text-sm font-bold text-ink tabular-nums">{count}</span>
+  // Hidden until the saved cart is read, so it never shows a wrong count and the button around it keeps its size.
+  const { loaded } = useCart()
+  return (
+    <span className={cn('grid size-6 place-items-center rounded-full bg-apricot text-sm font-bold text-ink tabular-nums', !loaded && 'invisible')}>
+      {count}
+    </span>
+  )
 }
 
 /** Below desktop width, the categories and deals as a row of tinted icon tiles. */
 export function CategoryIconRow() {
+  const pathname = usePathname()
   return (
     <nav aria-label="Danh mục" className="mb-8 xl:hidden">
       <ul className="grid grid-cols-4 gap-3">
         {NAV_LINKS.map((link) => (
           <li key={link.to}>
-            <NavLink to={link.to} className="group flex flex-col items-center gap-2 rounded-xl text-center text-sm font-semibold">
+            <Link
+              href={link.to}
+              aria-current={pathname === link.to ? 'page' : undefined}
+              className="group flex flex-col items-center gap-2 rounded-xl text-center text-sm font-semibold"
+            >
               <span className={cn('grid aspect-square w-full max-w-24 place-items-center rounded-2xl group-aria-[current=page]:ring-2 group-aria-[current=page]:ring-sea', link.tint)}>
                 <link.icon aria-hidden="true" className={cn('size-8', link.iconColor)} strokeWidth={1.75} />
               </span>
               {link.label}
-            </NavLink>
+            </Link>
           </li>
         ))}
       </ul>
@@ -86,25 +102,28 @@ export function CategoryIconRow() {
 }
 
 export function SiteHeader() {
-  const { count, setOpen } = useCart()
+  const { loaded, count, setOpen } = useCart()
   // On a phone the product page puts its own back and cart buttons over the photo instead.
-  const onProductPage = useMatch('/p/:slug') !== null
+  const onProductPage = usePathname().startsWith('/p/')
   return (
     <header className={cn('sticky top-0 z-40 border-b border-line bg-surface', onProductPage && 'max-md:hidden')}>
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-6">
-        <Link to="/" className="mr-auto flex items-center gap-2.5 rounded-md text-xl font-bold text-sea md:mr-0">
+        <Link href="/" className="mr-auto flex items-center gap-2.5 rounded-md text-xl font-bold text-sea md:mr-0">
           <span className="grid size-10 place-items-center rounded-xl bg-sea text-surface">
             <ShoppingBasket aria-hidden="true" className="size-5" />
           </span>
           {STORE_NAME}
         </Link>
-        <SearchForm />
+        {/* Pages built ahead of time don't know the address's search, so they start with an empty box. */}
+        <Suspense fallback={<SearchForm current="" />}>
+          <SearchFormFromAddress />
+        </Suspense>
         <Button
           type="button"
           size="lg"
           onClick={() => setOpen(true)}
           className="h-11 gap-2.5 rounded-xl bg-ink px-4 text-surface hover:bg-ink/85"
-          aria-label={`Mở giỏ hàng, ${count} món`}
+          aria-label={loaded ? `Mở giỏ hàng, ${count} món` : 'Mở giỏ hàng'}
         >
           <ShoppingCart aria-hidden="true" />
           <span className="hidden font-semibold md:inline">Giỏ hàng</span>
@@ -131,7 +150,7 @@ export function SiteFooter() {
           <ul className="mt-3 space-y-2">
             {NAV_LINKS.map((link) => (
               <li key={link.to}>
-                <Link className="text-ink-soft hover:text-ink hover:underline" to={link.to}>
+                <Link className="text-ink-soft hover:text-ink hover:underline" href={link.to}>
                   {link.label}
                 </Link>
               </li>
@@ -142,7 +161,7 @@ export function SiteFooter() {
           <p className="font-semibold">Giỏ hàng</p>
           <ul className="mt-3 space-y-2">
             <li>
-              <Link className="text-ink-soft hover:text-ink hover:underline" to="/cart">
+              <Link className="text-ink-soft hover:text-ink hover:underline" href="/cart">
                 Xem giỏ hàng
               </Link>
             </li>

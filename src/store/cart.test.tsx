@@ -63,6 +63,23 @@ describe('cart', () => {
     expect(saved.map((i) => i.key)).toEqual(['p09|chai-500ml'])
   })
 
+  it('reads the saved cart only after the first render, and never saves over it before then', () => {
+    const saved = JSON.stringify([{ key: 'p09|chai-500ml', productId: 'p09', packId: 'chai-500ml', qty: 2 }])
+    localStorage.setItem('thy-store.cart', saved)
+    const seen: { loaded: boolean; count: number }[] = []
+    renderHook(
+      () => {
+        const cart = useCart()
+        seen.push({ loaded: cart.loaded, count: cart.count })
+        return cart
+      },
+      { wrapper },
+    )
+    expect(seen[0]).toEqual({ loaded: false, count: 0 })
+    expect(seen.at(-1)).toEqual({ loaded: true, count: 2 })
+    expect(localStorage.getItem('thy-store.cart')).toBe(saved)
+  })
+
   it('ignores a cart saved by the old coffee store', () => {
     localStorage.setItem(
       'second-crack.cart',

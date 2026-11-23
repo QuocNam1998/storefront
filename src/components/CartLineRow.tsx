@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { ProductImage } from '@/components/ProductImage'
 import { QuantityStepper } from '@/components/QuantityStepper'
 import { formatPrice } from '@/lib/store'
@@ -13,7 +13,7 @@ export function CartLineRow({ line, onNavigate }: { line: CartLine; onNavigate?:
         <ProductImage product={line.product} />
       </div>
       <div className="min-w-0 flex-1">
-        <Link to={`/p/${line.product.slug}`} onClick={onNavigate} className="leading-snug font-semibold hover:underline">
+        <Link href={`/p/${line.product.slug}`} onClick={onNavigate} className="leading-snug font-semibold hover:underline">
           {line.product.name}
         </Link>
         <p className="text-sm text-muted-foreground">{line.pack.label}</p>

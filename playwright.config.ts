@@ -15,7 +15,7 @@ export default defineConfig({
     { name: 'mobile-chromium', use: { ...devices['Pixel 7'] } },
   ],
   webServer: {
-    command: 'pnpm dev --port 5173 --strictPort',
+    command: 'pnpm dev',
     url: 'http://localhost:5173',
     // In CI, always test a server this run started, never one left over from something else.
     reuseExistingServer: !isCI,

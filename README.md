@@ -1,7 +1,7 @@
 # Cửa hàng của Thy: a neighborhood grocery storefront
 
 A demo ecommerce site for a small Vietnamese grocery that sells snacks, water and drinks, and everyday essentials,
-built with React 19, TypeScript, Vite, Tailwind CSS v4 and shadcn/ui. The whole interface is in Vietnamese, prices are in đồng,
+built with Next.js 16, React 19, TypeScript, Tailwind CSS v4 and shadcn/ui, and deployed to Vercel. The whole interface is in Vietnamese, prices are in đồng,
 and orders are paid on delivery.
 No backend: products are in `src/data/catalog.ts`, and the cart and orders are saved in the browser's localStorage.
 
@@ -17,6 +17,7 @@ No backend: products are in `src/data/catalog.ts`, and the cart and orders are s
 pnpm install
 pnpm dev        # http://localhost:5173
 pnpm build      # type-check and production build
+pnpm start      # serve the production build
 pnpm lint
 pnpm test       # unit and component tests (Vitest)
 pnpm exec playwright install chromium   # once, before the first browser test run
@@ -48,7 +49,8 @@ src/
   lib/orders.ts           saving and reading demo orders
   components/ProductImage photo, or a placeholder in the category color with the subcategory icon
   components/ui/          shadcn/ui components
-  pages/                  one file per route
+  app/                    Next.js routes and layouts, a few lines each
+  views/                  one page component per route
 ```
 
 ## Design

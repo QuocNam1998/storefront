@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom'
+'use client'
+
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 export function NotFound() {
@@ -7,7 +9,7 @@ export function NotFound() {
       <h1 className="text-3xl font-semibold sm:text-4xl">Không tìm thấy trang</h1>
       <p className="mt-4 max-w-md text-lg">Đường dẫn có thể đã cũ hoặc bị gõ sai.</p>
       <Button asChild size="xl" className="mt-8">
-        <Link to="/">Về trang chủ</Link>
+        <Link href="/">Về trang chủ</Link>
       </Button>
     </div>
   )

@@ -1,4 +1,6 @@
-import { useParams, useSearchParams } from 'react-router-dom'
+'use client'
+
+import { useSearchParams } from 'next/navigation'
 import { ProductGrid } from '@/components/ProductGrid'
 import { CategoryIconRow } from '@/components/SiteChrome'
 import { Button } from '@/components/ui/button'
@@ -8,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { getCategoryBySlug, productsInCategory, type Product } from '@/data/catalog'
 import { unitPrice } from '@/lib/store'
-import { NotFound } from '@/pages/NotFound'
+import { NotFound } from '@/views/NotFound'
 
 type Compare = (a: Product, b: Product) => number
 
@@ -33,9 +35,8 @@ function filterProducts(list: Product[], subs: string[], inStockOnly: boolean): 
   return list.filter((p) => (subs.length === 0 || subs.includes(p.subcategoryId)) && (!inStockOnly || p.stock !== 'out'))
 }
 
-export function Category() {
-  const { slug = '' } = useParams()
-  const [params, setParams] = useSearchParams()
+export function Category({ slug }: { slug: string }) {
+  const params = useSearchParams()
   const category = getCategoryBySlug(slug)
   if (!category) return <NotFound />
 
@@ -50,7 +51,8 @@ export function Category() {
       if (v === null || v === '') next.delete(k)
       else next.set(k, v)
     }
-    setParams(next, { replace: true })
+    // Rewrite the address in place: the filter shows at once, with no trip to the server and no jump to the top.
+    window.history.replaceState(null, '', next.size ? `?${next}` : window.location.pathname)
   }
 
   return (
