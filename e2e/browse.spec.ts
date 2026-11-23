@@ -37,9 +37,12 @@ test('sorting by price lists each product no cheaper than the one before', async
   await page.getByRole('combobox', { name: 'Sắp xếp' }).click()
   await page.getByRole('option', { name: 'Giá thấp đến cao', exact: true }).click()
   await expect(page).toHaveURL(/[?&]sort=price-asc/)
-  const prices = await listedPrices(page)
-  expect(prices).toHaveLength(8)
-  expect(prices).toEqual([...prices].sort((a, b) => a - b))
+  // The list re-sorts a moment after the address changes, so check again until it has.
+  await expect(async () => {
+    const prices = await listedPrices(page)
+    expect(prices).toHaveLength(8)
+    expect(prices).toEqual([...prices].sort((a, b) => a - b))
+  }).toPass()
 })
 
 test('in-stock only hides products that are sold out', async ({ page }) => {

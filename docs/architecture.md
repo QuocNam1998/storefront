@@ -53,6 +53,6 @@ The cart and orders never leave the browser. The server only sends pages and the
 
 ## Known concerns
 
-- `pnpm dev` and the production build differ on one page. On a phone, the unknown-product not found page shows the site header in production but not on the development server ([feature decision 0001](features/nextjs-migration/decisions/0001-unknown-category-not-found-drawn-in-browser.md)). The browser tests run on the development server.
+- `pnpm dev` and the production build differ on one page. On a phone, the unknown-product not found page shows the site header in production but not on the development server ([feature decision 0001](features/nextjs-migration/decisions/0001-unknown-category-not-found-drawn-in-browser.md)). The browser tests run on the production build ([feature decision 0002](features/nextjs-migration/decisions/0002-browser-tests-on-the-built-store.md)).
 
 Fix new ones with `/bug`.

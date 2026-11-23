@@ -16,7 +16,7 @@ The store is a browser-only React app built with Vite and React Router. Thy need
 - **Page components move from `src/pages/` to `src/views/`.** Next.js treats any `src/pages/` folder as old-style routes. Checked 2026-11-22: a `src/pages/Home.tsx` beside `src/app/` made `next build` fail.
 - **Pages and site components stay client components.** Next.js still renders them to HTML on the server, so their content is in the page before any script runs. Only route files and layouts are server components for now. Server-only code (API routes, database access) arrives with the features that need it.
 - **Browser storage is read only after the page has loaded**, never during the first render. That covers the cart and orders, and anything else later that lives in localStorage. Until then, the parts that depend on it show nothing rather than a guess.
-- **Vitest keeps Vite for tests only.** Its settings move from `vite.config.ts` to `vitest.config.ts`. Playwright still starts `pnpm dev` on port 5173.
+- **Vitest keeps Vite for tests only.** Its settings move from `vite.config.ts` to `vitest.config.ts`. Playwright builds the store and serves it with `pnpm start` on port 5173 ([nextjs-migration feature decision 0002](../features/nextjs-migration/decisions/0002-browser-tests-on-the-built-store.md)).
 
 ## Alternatives considered
 
